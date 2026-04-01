@@ -13,6 +13,7 @@
     "@elysiajs/eden": "^1.4.8",
     "@elysiajs/jwt": "^1.4.1",
     "@elysiajs/node": "^1.4.5",
+    "@gravity-ui/icons": "^2.18.0",
     "@heroui/react": "^3.0.0-rc.1",
     "@heroui/styles": "^3.0.0-rc.1",
     "@prisma/adapter-better-sqlite3": "^7.4.2",

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import MyNavbar from "../api/user/[[...slug]]/navbar";
+import MyNavbar from "./navbar";
 import { api } from "../api/user/[[...slug]]/route";
 
 export default async function () {
