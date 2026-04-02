@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import MyNavbar from "./navbar";
 import { api } from "../api/user/[[...slug]]/route";
+import Sidebar from "./sidebar";
 
 export default async function () {
 
@@ -22,8 +22,11 @@ export default async function () {
   })
 
   return (
-    <div className="w-full min-h-screen">
-      <MyNavbar user={user.data}/>
+    <div className="w-full min-h-screen flex items-stretch">
+      <Sidebar className="w-1/6"/>
+      <main>
+        
+      </main>
     </div>
   )
 }
