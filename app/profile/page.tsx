@@ -15,7 +15,7 @@ export default async function () {
     <div className="w-full min-h-screen flex items-stretch">
       <Sidebar />
       <main>
-
+        
       </main>
     </div>
   )

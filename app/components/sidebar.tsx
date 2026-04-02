@@ -1,10 +1,10 @@
-'use client'
-
 import Link from "next/link";
 import { Avatar, Label, Description } from "@heroui/react";
-import { useEffect, useState } from "react";
 import { User } from "@/generated/prisma/client";
-import { redirect, usePathname } from "next/navigation";
+import { redirect } from "next/navigation";
+import SidebarItem from "./sidebarItem";
+import { api } from "../api/user/[[...slug]]/route";
+import { cookies } from "next/headers";
 
 const items = [
   { text: 'Dashboard', link: '/dashboard' },
@@ -17,29 +17,22 @@ const items = [
   { text: 'Logout', link: '/logout' },
 ]
 
-export default function Sidebar({ className }: {
+export default async function Sidebar({ className }: {
   className?: string
 }) {
 
-  const pathname = usePathname()
+  const cookieStore = await cookies()
 
-  const [user, setUser] = useState<User | null>(null)
-
-  async function fetchData() {
-    const response = await fetch('/api/user', { credentials: 'include' })
-    if (response.ok) {
-      setUser(await response.json())
-    } else {
-      switch (response.status) {
-        case 401:
-          redirect('/login')
+  const response = await api.user.get({
+    fetch: {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': `auth=${cookieStore.get('auth')?.value}`
       }
     }
-  }
+  })
 
-  useEffect(() => {
-    fetchData()
-  }, [])
+  const user = response.data
 
   return (
     <div className={`border-r fixed h-full w-1/6 ${className}`}>
@@ -57,12 +50,7 @@ export default function Sidebar({ className }: {
       </Link>
       {items.map((item) => {
         return (
-          <Link
-            className={`w-full px-4 py-2 hover:bg-slate-100 inline-block ${pathname === item.link ? 'bg-slate-100' : ''}`}
-            href={item.link}
-            key={'LinkTo' + item.text}>
-            {item.text}
-          </Link>
+          <SidebarItem key={item.link} item={item} />
         )
       })}
     </div>
