@@ -28,7 +28,7 @@ export default async function () {
   return (
     <div className="w-full min-h-screen flex items-stretch">
       <Sidebar />
-      <main className="grow flex flex-col p-4">
+      <main className="grow flex flex-col p-6 gap-6">
         <ProfileForm user={user} />
       </main>
     </div>

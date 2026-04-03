@@ -31,6 +31,19 @@ export const app = new Elysia({ prefix: '/api/user' })
   .get('/', async ({ user }) => {
     return user
   })
+  .put('/', async ({ user, body }) => {
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: body
+    })
+
+    return status('OK')
+  }, {
+    body: t.Object({
+      nickname: t.String()
+    })
+  })
   .put('/upload-avator', async ({ user, body }) => {
 
     const baseUrl = 'storage/'

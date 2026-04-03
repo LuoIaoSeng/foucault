@@ -1,15 +1,20 @@
 'use client'
 
 import { User } from "@/generated/prisma/client"
-import { Avatar, Badge, Description, Label, toast } from "@heroui/react"
+import { Avatar, Badge, Button, DateField, DateValue, Description, Input, Label, Radio, RadioGroup, TextField, TimeField, toast } from "@heroui/react"
 import { Camera } from '@gravity-ui/icons';
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { parseAbsolute, parseDate, parseZonedDateTime } from "@internationalized/date";
+
 
 export default function ({ user }: {
   user: User | null
 }) {
 
   const router = useRouter()
+
+  const [nickname, setNickname] = useState(user?.nickname ?? '')
 
   async function inputFile() {
 
@@ -33,13 +38,14 @@ export default function ({ user }: {
           credentials: 'include'
         })
 
-        if(response.ok) {
+        if (response.ok) {
           router.refresh()
           toast.success('Update avator sucessfully')
         }
       }
     })
   }
+  const [value, setValue] = useState<DateValue | null>(null);
 
   return (
     <>
@@ -58,7 +64,59 @@ export default function ({ user }: {
           <Description className="text-2xl">{user?.username}</Description>
         </div>
       </div>
+      <div className="flex flex-col gap-4">
+        <TextField className="w-full max-w-64" name="nickname" type="text">
+          <Label>Nickname</Label>
+          <Input value={nickname} onChange={(e) => setNickname(e.target.value)} placeholder="Nickname" />
+        </TextField>
+        <DateField className="w-[256px]" name="date" value={parseDate(user?.birthday.toISOString().split('T')[0]!)} isDisabled>
+          <Label>Date of birth</Label>
+          <DateField.Group>
+            <DateField.Input>{(segment) => <DateField.Segment segment={segment} />}</DateField.Input>
+          </DateField.Group>
+        </DateField>
+        <RadioGroup name="gender" isDisabled value={user?.gender} orientation="horizontal">
+          <Label>Gender</Label>
+          <Radio value="M">
+            <Radio.Control>
+              <Radio.Indicator />
+            </Radio.Control>
+            <Radio.Content>
+              <Label>Male</Label>
+            </Radio.Content>
+          </Radio>
+          <Radio value="F">
+            <Radio.Control>
+              <Radio.Indicator />
+            </Radio.Control>
+            <Radio.Content>
+              <Label>Female</Label>
+            </Radio.Content>
+          </Radio>
+        </RadioGroup>
+        <Button
+          onPress={async () => {
+            const response = await fetch('/api/user/', {
+              method: 'put',
+              body: JSON.stringify({
+                nickname
+              }),
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              credentials: 'include'
+            })
+            if(response.ok) {
+              toast.success('Update information successfully')
+            }
+          }}
+        >
+          Update
+        </Button>
+      </div>
+      <div>
 
+      </div>
     </>
   )
 }
