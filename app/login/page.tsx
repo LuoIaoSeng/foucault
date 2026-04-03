@@ -1,7 +1,7 @@
 "use client";
 
 import { Check } from "@gravity-ui/icons";
-import { Button, Description, FieldError, Form, Input, Label, TextField } from "@heroui/react";
+import { Button, FieldError, Form, Input, Label, TextField } from "@heroui/react";
 import { redirect } from "next/navigation";
 
 export default function () {

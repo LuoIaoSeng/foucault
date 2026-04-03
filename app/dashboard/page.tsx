@@ -1,4 +1,4 @@
-import Sidebar from "@/app/components/sidebar";
+import Sidebar from "@/app/components/Sidebar";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 

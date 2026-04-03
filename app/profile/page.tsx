@@ -1,6 +1,9 @@
-import Sidebar from "@/app/components/sidebar";
+import { Avatar } from "@heroui/react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { api } from "../api/user/[[...slug]]/route";
+import Sidebar from "../components/Sidebar";
+import ProfileForm from "./ProfileForm";
 
 export default async function () {
 
@@ -11,11 +14,22 @@ export default async function () {
     redirect('/login')
   }
 
+  const response = await api.user.get({
+    fetch: {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': `auth=${token}`
+      }
+    }
+  })
+
+  const user = response.data
+
   return (
     <div className="w-full min-h-screen flex items-stretch">
       <Sidebar />
-      <main>
-        
+      <main className="grow flex flex-col p-4">
+        <ProfileForm user={user} />
       </main>
     </div>
   )

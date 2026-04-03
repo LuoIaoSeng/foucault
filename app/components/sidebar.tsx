@@ -1,10 +1,9 @@
-import Link from "next/link";
-import { Avatar, Label, Description } from "@heroui/react";
-import { User } from "@/generated/prisma/client";
-import { redirect } from "next/navigation";
-import SidebarItem from "./sidebarItem";
-import { api } from "../api/user/[[...slug]]/route";
+import { Avatar, Description, Label } from "@heroui/react";
 import { cookies } from "next/headers";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { api } from "../api/user/[[...slug]]/route";
+import SidebarItem from "./SidebarItem";
 
 const items = [
   { text: 'Dashboard', link: '/dashboard' },
@@ -22,12 +21,17 @@ export default async function Sidebar({ className }: {
 }) {
 
   const cookieStore = await cookies()
+  const token = cookieStore.get('auth')?.value;
+
+  if (!token) {
+    redirect('/login')
+  }
 
   const response = await api.user.get({
     fetch: {
       headers: {
         'Content-Type': 'application/json',
-        'Cookie': `auth=${cookieStore.get('auth')?.value}`
+        'Cookie': `auth=${token}`
       }
     }
   })
@@ -35,7 +39,7 @@ export default async function Sidebar({ className }: {
   const user = response.data
 
   return (
-    <div className={`border-r fixed h-full w-1/6 ${className}`}>
+    <div className={`border-r w-1/6 ${className ?? ''}`}>
       <Link
         className="w-full p-3 hover:bg-slate-100 inline-flex gap-4 items-center"
         href={'/profile'}>
