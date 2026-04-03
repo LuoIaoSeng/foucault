@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { api } from "../api/user/[[...slug]]/route";
 import SidebarItem from "./SidebarItem";
+import LogoutItem from "./LogoutItem";
 
 const items = [
   { text: 'Dashboard', link: '/dashboard' },
@@ -13,7 +14,6 @@ const items = [
   { text: 'Timetable', link: '/timetable' },
   { text: 'Add/Drop', link: '/adddrop' },
   { text: 'Debit', link: '/debit' },
-  { text: 'Logout', link: '/logout' },
 ]
 
 export default async function Sidebar({ className }: {
@@ -57,6 +57,7 @@ export default async function Sidebar({ className }: {
           <SidebarItem key={item.link} item={item} />
         )
       })}
+      <LogoutItem />
     </div>
   )
 }

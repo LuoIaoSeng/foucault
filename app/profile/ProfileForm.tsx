@@ -1,11 +1,11 @@
 'use client'
 
-import { User } from "@/generated/prisma/client"
-import { Avatar, Badge, Button, DateField, DateValue, Description, Input, Label, Radio, RadioGroup, TextField, TimeField, toast } from "@heroui/react"
+import { User } from "@/generated/prisma/client";
 import { Camera } from '@gravity-ui/icons';
+import { Avatar, Badge, Button, DateField, Description, ErrorMessage, FieldError, Input, Label, Radio, RadioGroup, TextField, toast } from "@heroui/react";
+import { parseDate } from "@internationalized/date";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { parseAbsolute, parseDate, parseZonedDateTime } from "@internationalized/date";
 
 
 export default function ({ user }: {
@@ -45,7 +45,9 @@ export default function ({ user }: {
       }
     })
   }
-  const [value, setValue] = useState<DateValue | null>(null);
+
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
 
   return (
     <>
@@ -106,7 +108,7 @@ export default function ({ user }: {
               },
               credentials: 'include'
             })
-            if(response.ok) {
+            if (response.ok) {
               toast.success('Update information successfully')
             }
           }}
@@ -114,8 +116,46 @@ export default function ({ user }: {
           Update
         </Button>
       </div>
-      <div>
-
+      <div className="flex flex-col gap-4">
+        <TextField className="w-full max-w-64" type="password" name="password">
+          <Label>New Password</Label>
+          <Input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="New password" />
+          <FieldError />
+        </TextField>
+        <TextField className="w-full max-w-64" type="password" name="password">
+          <Label>Confirm Password</Label>
+          <Input value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm password" />
+          <FieldError />
+        </TextField>
+        <Button
+          variant="tertiary"
+          onPress={async () => {
+            if (confirmPassword !== password) {
+              toast.danger('Confirm password is not equal to the new password')
+              return
+            }
+            if (confirmPassword === '') {
+              toast.danger('Password cannot be empty')
+              return
+            }
+            const response = await fetch('/api/auth/reset-password', {
+              method: 'post',
+              body: JSON.stringify({
+                password,
+                confirmPassword
+              }),
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              credentials: 'include'
+            })
+            if (response.ok) {
+              toast.success('Reset password successfully')
+            }
+          }}
+        >
+          Reset password
+        </Button>
       </div>
     </>
   )

@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { treaty } from "@elysiajs/eden"
 import jwt from "@elysiajs/jwt"
-import { compare } from "bcryptjs"
+import bcrypt, { compare } from "bcryptjs"
 import Elysia, { status, t } from "elysia"
 
 export const app = new Elysia({ prefix: '/api/auth' })
@@ -37,14 +37,53 @@ export const app = new Elysia({ prefix: '/api/auth' })
       maxAge: 7 * 86400
     })
 
-    return {
-      message: 'ok'
-    }
+    return status('OK')
 
   }, {
     body: t.Object({
       username: t.String({ minLength: 4 }),
       password: t.String({ minLength: 4 })
+    })
+  })
+  .post('/logout', async ({ cookie: { auth } }) => {
+    auth.remove()
+    return status('OK')
+  })
+  .onBeforeHandle(async ({ jwt, cookie: { auth } }) => {
+    const verify = await jwt.verify(auth.value as string)
+    if (!verify) {
+      return status('Unauthorized')
+    }
+  })
+  .derive(async ({ jwt, cookie: { auth } }) => {
+    const verify = await jwt.verify(auth.value as string) as {
+      id: number
+    }
+    const user = await prisma.user.findUnique({ where: { id: Number(verify.id) } })
+    if (!user) {
+      return status('Bad Request')
+    }
+    return {
+      user
+    }
+  })
+  .post('/reset-password', async ({ user, body }) => {
+    if (body.password !== body.confirmPassword) {
+      return status('Unprocessable Content')
+    }
+    if (body.password.length === 0) {
+      return status('Unprocessable Content')
+    }
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { password: await bcrypt.hash(body.password, await bcrypt.genSalt()) }
+    })
+
+    return status('OK')
+  }, {
+    body: t.Object({
+      password: t.String(),
+      confirmPassword: t.String()
     })
   })
 
