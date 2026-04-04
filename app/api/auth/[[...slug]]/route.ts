@@ -37,7 +37,9 @@ export const app = new Elysia({ prefix: '/api/auth' })
       maxAge: 7 * 86400
     })
 
-    return status('OK')
+    return {
+      role: user.role
+    }
 
   }, {
     body: t.Object({

@@ -67,11 +67,11 @@ export default function ({ user }: {
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <TextField className="w-full max-w-64" name="nickname" type="text">
+        <TextField className="w-full w-lg" name="nickname" type="text">
           <Label>Nickname</Label>
           <Input value={nickname} onChange={(e) => setNickname(e.target.value)} placeholder="Nickname" />
         </TextField>
-        <DateField className="w-[256px]" name="date" value={parseDate(user?.birthday.toISOString().split('T')[0]!)} isDisabled>
+        <DateField className="w-lg" name="date" value={parseDate(user?.birthday.toISOString().split('T')[0]!)} isDisabled>
           <Label>Date of birth</Label>
           <DateField.Group>
             <DateField.Input>{(segment) => <DateField.Segment segment={segment} />}</DateField.Input>
@@ -117,12 +117,12 @@ export default function ({ user }: {
         </Button>
       </div>
       <div className="flex flex-col gap-4">
-        <TextField className="w-full max-w-64" type="password" name="password">
+        <TextField className="w-lg" type="password" name="password">
           <Label>New Password</Label>
           <Input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="New password" />
           <FieldError />
         </TextField>
-        <TextField className="w-full max-w-64" type="password" name="password">
+        <TextField className="w-lg" type="password" name="password">
           <Label>Confirm Password</Label>
           <Input value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm password" />
           <FieldError />

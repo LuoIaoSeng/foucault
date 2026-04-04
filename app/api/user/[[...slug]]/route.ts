@@ -78,6 +78,16 @@ export const app = new Elysia({ prefix: '/api/user' })
       image: t.File({ format: 'image/*' })
     })
   })
+  .onBeforeHandle(async ({ user }) => {
+    if (user.role !== 'ADMIN')
+      return status('Unauthorized')
+  })
+  .get('/all', async () => {
+    const users = await prisma.user.findMany()
+    return {
+      users
+    }
+  })
 
 export const GET = app.fetch
 export const POST = app.fetch
