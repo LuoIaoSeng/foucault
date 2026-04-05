@@ -39,7 +39,7 @@ export default function ({ user }: {
         const formData = new FormData()
         formData.append('image', files[0])
 
-        const response = await fetch('/api/user/upload-avator', {
+        const response = await fetch(`/api/user/upload-avator/${user?.id}`, {
           method: 'put',
           body: formData,
           credentials: 'include'
@@ -201,7 +201,7 @@ export default function ({ user }: {
               toast.danger('Password cannot be empty')
               return
             }
-            const response = await fetch('/api/auth/reset-password', {
+            const response = await fetch(`/api/auth/reset-password/${user?.id}`, {
               method: 'post',
               body: JSON.stringify({
                 password,

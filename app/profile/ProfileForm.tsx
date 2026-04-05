@@ -1,6 +1,7 @@
 'use client'
 
 import { User } from "@/generated/prisma/client";
+import { getDateString } from "@/lib/date";
 import { Camera } from '@gravity-ui/icons';
 import { Avatar, Badge, Button, DateField, Description, ErrorMessage, FieldError, Input, Label, Radio, RadioGroup, TextField, toast } from "@heroui/react";
 import { parseDate } from "@internationalized/date";
@@ -71,7 +72,7 @@ export default function ({ user }: {
           <Label>Nickname</Label>
           <Input value={nickname} onChange={(e) => setNickname(e.target.value)} placeholder="Nickname" />
         </TextField>
-        <DateField className="w-lg" name="date" value={parseDate(user?.birthday.toISOString().split('T')[0]!)} isDisabled>
+        <DateField className="w-lg" name="date" value={parseDate(getDateString(user?.birthday!))} isDisabled>
           <Label>Date of birth</Label>
           <DateField.Group>
             <DateField.Input>{(segment) => <DateField.Segment segment={segment} />}</DateField.Input>

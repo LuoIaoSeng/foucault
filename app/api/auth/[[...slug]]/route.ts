@@ -88,6 +88,29 @@ export const app = new Elysia({ prefix: '/api/auth' })
       confirmPassword: t.String()
     })
   })
+  .onBeforeHandle(async ({ user }) => {
+    if (user.role !== 'ADMIN')
+      return status('Unauthorized')
+  })
+  .post('/reset-password/:id', async ({ body, params: { id } }) => {
+    if (body.password !== body.confirmPassword) {
+      return status('Unprocessable Content')
+    }
+    if (body.password.length === 0) {
+      return status('Unprocessable Content')
+    }
+    await prisma.user.update({
+      where: { id: parseInt(id) },
+      data: { password: await bcrypt.hash(body.password, await bcrypt.genSalt()) }
+    })
+
+    return status('OK')
+  }, {
+    body: t.Object({
+      password: t.String(),
+      confirmPassword: t.String()
+    })
+  })
 
 export const GET = app.fetch
 export const POST = app.fetch

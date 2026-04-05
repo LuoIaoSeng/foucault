@@ -18,7 +18,7 @@ export default async function () {
     fetch: {
       headers: {
         'Content-Type': 'application/json',
-        'Cookie': `auth=${token}`
+        'cookie': `auth=${token}`
       }
     }
   })
@@ -32,6 +32,7 @@ export default async function () {
   return (
     <div className="w-full min-h-screen flex items-stretch">
       {user?.role === 'ADMIN' && <AdminSidebar user={user} />}
+      {user?.role === 'STUDENT' && <AdminSidebar user={user} />}
       <Separator orientation="vertical" />
       <main className="grow flex flex-col p-6 gap-6">
         <ProfileForm user={user} />

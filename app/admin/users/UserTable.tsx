@@ -1,10 +1,11 @@
 "use client";
 
 import { User } from "@/generated/prisma/client";
-import { PencilToSquare, TrashBin } from '@gravity-ui/icons';
-import { AlertDialog, Avatar, Button, Chip, Input, Pagination, Table } from "@heroui/react";
+import { PencilToSquare, TrashBin, Plus } from '@gravity-ui/icons';
+import { AlertDialog, Avatar, Button, Chip, Description, Input, Label, Modal, Pagination, SearchField, Surface, Table } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import AddUserForm from "./AddUserForm";
 
 const columns = [
   { id: "id", name: "Id" },
@@ -16,7 +17,7 @@ const columns = [
   { id: "action", name: "Actions" },
 ];
 
-const ROWS_PER_PAGE = 4;
+const ROWS_PER_PAGE = 9;
 
 const statusColorMap: Record<string, "accent" | "default" | "warning"> = {
   ADMIN: "accent",
@@ -51,7 +52,18 @@ export default function ({ users }: {
 
   return (
     <>
-      <Input placeholder="Search by username" value={username} onChange={(e) => { setUsername(e.target.value) }} />
+      <div className="flex justify-between">
+        <SearchField name="search" value={username} onChange={setUsername}>
+          {/* <Label>Search Users</Label> */}
+          <SearchField.Group>
+            <SearchField.SearchIcon />
+            <SearchField.Input className="w-70" placeholder="Enter username" />
+            <SearchField.ClearButton />
+          </SearchField.Group>
+          {/* <Description>Enter username to search for users</Description> */}
+        </SearchField>
+        <AddUserForm />
+      </div>
       <Table>
         <Table.ResizableContainer>
           <Table.Content aria-label="Table with pagination" className="w-full">

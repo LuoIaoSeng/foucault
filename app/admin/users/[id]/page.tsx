@@ -14,7 +14,7 @@ export default async function ({ params }: {
 
   const { id } = await params
 
-  const user = await api.user.show({ id }).get({ fetch: { headers: { 'cookie': `auth=${token}` } } })
+  const user = await api.user.admin.show({ id }).get({ fetch: { headers: { 'cookie': `auth=${token}` } } })
 
   if(!user.data) {
     unauthorized()

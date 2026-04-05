@@ -30,7 +30,7 @@ export default async function ({ children }: { children: ReactNode }) {
     <div className="w-full min-h-screen flex items-stretch">
       <AdminSidebar user={user.data} />
       <Separator orientation="vertical" />
-      <main className="flex flex-col gap-6 grow p-6">
+      <main className="flex flex-col gap-6 grow p-6 max-h-screen overflow-y-scroll">
         {children}
       </main>
     </div>
