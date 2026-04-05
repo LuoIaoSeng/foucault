@@ -1,8 +1,9 @@
 'use client'
 
 import { User } from "@/generated/prisma/client";
+import { getDateString } from "@/lib/date";
 import { Camera } from '@gravity-ui/icons';
-import { Avatar, Badge, Button, DateField, Description, ErrorMessage, FieldError, Input, Label, Radio, RadioGroup, TextField, toast } from "@heroui/react";
+import { Avatar, Badge, Button, DateField, DateValue, Description, FieldError, Input, Label, Radio, RadioGroup, TextField, toast } from "@heroui/react";
 import { parseDate } from "@internationalized/date";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -15,6 +16,12 @@ export default function ({ user }: {
   const router = useRouter()
 
   const [nickname, setNickname] = useState(user?.nickname ?? '')
+  const [firstname, setFirstname] = useState(user?.first_name ?? '')
+  const [lastname, setLastname] = useState(user?.last_name ?? '')
+  const [birthday, setBirthday] = useState<DateValue | null>(parseDate(getDateString(user?.birthday!)))
+  const [gender, setGender] = useState(user?.gender ?? '')
+  const [username, setUsername] = useState(user?.username ?? '')
+  const [role, setRole] = useState(user?.role ?? '')
 
   async function inputFile() {
 
@@ -54,7 +61,7 @@ export default function ({ user }: {
       <div className="flex items-center gap-6">
         <Badge.Anchor>
           <Avatar className="size-24 cursor-pointer hover:brightness-75" variant="default" onClick={inputFile}>
-            <Avatar.Image alt={`${user?.first_name ?? ''} ${user?.last_name}`} src={user?.avator_path ?? ''} />
+            <Avatar.Image alt={`${user?.first_name ?? ''} ${user?.last_name}`} src={'/' + (user?.avator_path ?? '')} />
             <Avatar.Fallback className="text-4xl">{`${user?.first_name?.at(0) ?? ''}${user?.last_name?.at(0) ?? ''}`}</Avatar.Fallback>
           </Avatar>
           <Badge placement="bottom-right" size="lg">
@@ -67,17 +74,66 @@ export default function ({ user }: {
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <TextField className="w-lg" name="nickname" type="text">
+        <div className="flex gap-4">
+          <TextField className="flex-1" value={firstname} onChange={setFirstname}>
+            <Label>First Name</Label>
+            <Input placeholder="First name" />
+          </TextField>
+          <TextField className="flex-1" value={lastname} onChange={setLastname}>
+            <Label>Last Name</Label>
+            <Input placeholder="Last name" />
+          </TextField>
+        </div>
+        <TextField className="w-full" value={nickname} onChange={setNickname}>
           <Label>Nickname</Label>
-          <Input value={nickname} onChange={(e) => setNickname(e.target.value)} placeholder="Nickname" />
+          <Input placeholder="Nickname" />
         </TextField>
-        <DateField className="w-lg" name="date" value={parseDate(user?.birthday.toISOString().split('T')[0]!)} isDisabled>
+        <TextField className="w-full" value={username} onChange={setUsername}>
+          <Label>Username</Label>
+          <Input placeholder="Username" />
+        </TextField>
+        <RadioGroup value={role} onChange={setRole} orientation="horizontal">
+          <Label className="mb-2">Role</Label>
+          <Radio value="ADMIN">
+            <Radio.Control>
+              <Radio.Indicator />
+            </Radio.Control>
+            <Radio.Content>
+              <Label>Admin</Label>
+            </Radio.Content>
+          </Radio>
+          <Radio value="EDUCATOR">
+            <Radio.Control>
+              <Radio.Indicator />
+            </Radio.Control>
+            <Radio.Content>
+              <Label>Educator</Label>
+            </Radio.Content>
+          </Radio>
+          <Radio value="STUDENT">
+            <Radio.Control>
+              <Radio.Indicator />
+            </Radio.Control>
+            <Radio.Content>
+              <Label>Student</Label>
+            </Radio.Content>
+          </Radio>
+          <Radio value="EMPLOYEE">
+            <Radio.Control>
+              <Radio.Indicator />
+            </Radio.Control>
+            <Radio.Content>
+              <Label>Employee</Label>
+            </Radio.Content>
+          </Radio>
+        </RadioGroup>
+        <DateField className="w-full" name="date" value={birthday} onChange={setBirthday}>
           <Label>Date of birth</Label>
           <DateField.Group>
             <DateField.Input>{(segment) => <DateField.Segment segment={segment} />}</DateField.Input>
           </DateField.Group>
         </DateField>
-        <RadioGroup name="gender" isDisabled value={user?.gender} orientation="horizontal">
+        <RadioGroup name="gender" value={gender} onChange={setGender} orientation="horizontal">
           <Label>Gender</Label>
           <Radio value="M">
             <Radio.Control>
@@ -98,10 +154,16 @@ export default function ({ user }: {
         </RadioGroup>
         <Button
           onPress={async () => {
-            const response = await fetch('/api/user/', {
+            const response = await fetch(`/api/user/update/${user?.id}`, {
               method: 'put',
               body: JSON.stringify({
-                nickname
+                nickname,
+                first_name: firstname,
+                last_name: lastname,
+                username,
+                birthday: birthday?.toString(),
+                role,
+                gender
               }),
               headers: {
                 'Content-Type': 'application/json'
@@ -110,6 +172,7 @@ export default function ({ user }: {
             })
             if (response.ok) {
               toast.success('Update information successfully')
+              router.refresh()
             }
           }}
         >

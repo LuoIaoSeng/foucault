@@ -1,8 +1,6 @@
 import { api } from "@/app/api/user/[[...slug]]/route";
-import Sidebar from "@/app/components/Sidebar";
-import { Separator, Table } from "@heroui/react";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { redirect, unauthorized } from "next/navigation";
 import UserTable from "./UserTable";
 
 export default async function () {
@@ -16,13 +14,13 @@ export default async function () {
 
   const users = await api.user.all.get({ fetch: { headers: { 'cookie': `auth=${token}` } } })
 
+  if(users.status !== 200) {
+    unauthorized()
+  }
+
   return (
-    <div className="w-full min-h-screen flex items-stretch">
-      <Sidebar />
-      <Separator orientation="vertical" />
-      <main className="grow flex flex-col p-6 gap-6">
-        <UserTable users={users.data?.users!} />
-      </main>
-    </div>
+    <>
+      <UserTable users={users.data!} />
+    </>
   )
 }

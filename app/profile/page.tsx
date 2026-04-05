@@ -1,7 +1,8 @@
+import { Separator } from "@heroui/react";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { redirect, unauthorized } from "next/navigation";
+import AdminSidebar from "../admin/AdminSidebar";
 import { api } from "../api/user/[[...slug]]/route";
-import Sidebar from "../components/Sidebar";
 import ProfileForm from "./ProfileForm";
 
 export default async function () {
@@ -22,11 +23,16 @@ export default async function () {
     }
   })
 
+  if(response.status !== 200) {
+    unauthorized()
+  }
+
   const user = response.data
 
   return (
     <div className="w-full min-h-screen flex items-stretch">
-      <Sidebar />
+      {user?.role === 'ADMIN' && <AdminSidebar user={user} />}
+      <Separator orientation="vertical" />
       <main className="grow flex flex-col p-6 gap-6">
         <ProfileForm user={user} />
       </main>

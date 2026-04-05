@@ -2,7 +2,8 @@
 
 import { User } from "@/generated/prisma/client";
 import { PencilToSquare, TrashBin } from '@gravity-ui/icons';
-import { Avatar, Button, Chip, Pagination, Table } from "@heroui/react";
+import { AlertDialog, Avatar, Button, Chip, Pagination, Table } from "@heroui/react";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 const columns = [
@@ -39,6 +40,8 @@ export default function ({ users }: {
 
   const start = (page - 1) * ROWS_PER_PAGE + 1;
   const end = Math.min(page * ROWS_PER_PAGE, users.length);
+
+  const router = useRouter()
 
   return (
     <Table>
@@ -77,12 +80,40 @@ export default function ({ users }: {
 
                 <Table.Cell>
                   <div className="flex items-center gap-1">
-                    <Button isIconOnly size="sm" variant="tertiary">
+                    <Button isIconOnly size="sm" variant="tertiary" onClick={() => router.push(`/admin/users/${user.id}`)}>
                       <PencilToSquare />
                     </Button>
-                    <Button isIconOnly size="sm" variant="danger">
-                      <TrashBin />
-                    </Button>
+
+                    <AlertDialog>
+                      <Button isIconOnly size="sm" variant="danger">
+                        <TrashBin />
+                      </Button>
+                      <AlertDialog.Backdrop>
+                        <AlertDialog.Container>
+                          <AlertDialog.Dialog className="sm:max-w-100">
+                            <AlertDialog.CloseTrigger />
+                            <AlertDialog.Header>
+                              <AlertDialog.Icon status="danger" />
+                              <AlertDialog.Heading>Delete this user permanently?</AlertDialog.Heading>
+                            </AlertDialog.Header>
+                            <AlertDialog.Body>
+                              <p>
+                                This will permanently delete User <strong>#{user.id}</strong> and all of its
+                                data. This action cannot be undone.
+                              </p>
+                            </AlertDialog.Body>
+                            <AlertDialog.Footer>
+                              <Button slot="close" variant="tertiary">
+                                Cancel
+                              </Button>
+                              <Button slot="close" variant="danger" onPress={() => { alert('') }}>
+                                Delete User
+                              </Button>
+                            </AlertDialog.Footer>
+                          </AlertDialog.Dialog>
+                        </AlertDialog.Container>
+                      </AlertDialog.Backdrop>
+                    </AlertDialog>
                   </div>
                 </Table.Cell>
               </Table.Row>

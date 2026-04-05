@@ -1,7 +1,9 @@
+import { Role } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma"
 import { treaty } from "@elysiajs/eden"
 import jwt from "@elysiajs/jwt"
 import Elysia, { status, t } from "elysia"
+import { revalidatePath } from "next/cache";
 import fs from "node:fs/promises";
 
 
@@ -84,9 +86,39 @@ export const app = new Elysia({ prefix: '/api/user' })
   })
   .get('/all', async () => {
     const users = await prisma.user.findMany()
-    return {
-      users
+    return users
+  })
+  .get('/show/:id', async ({ params: { id } }) => {
+    const user = await prisma.user.findUnique({ where: { id: parseInt(id) } })
+    if (!user) {
+      return status(404)
     }
+    return user
+  })
+  .put('/update/:id', async ({ params: { id }, body }) => {
+    await prisma.user.update({
+      where: { id: parseInt(id) }, data: {
+        username: body.username,
+        first_name: body.first_name,
+        last_name: body.last_name,
+        nickname: body.nickname,
+        birthday: new Date(body.birthday),
+        gender: body.gender,
+        role: body.role
+      }
+    })
+
+    return status('OK')
+  }, {
+    body: t.Object({
+      username: t.String(),
+      first_name: t.String(),
+      last_name: t.String(),
+      nickname: t.String(),
+      birthday: t.String(),
+      gender: t.String(),
+      role: t.Enum(Role)
+    })
   })
 
 export const GET = app.fetch

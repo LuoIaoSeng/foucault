@@ -71,7 +71,7 @@ export default async function Sidebar({ className }: {
   const user = response.data
 
   return (
-    <div className={`w-1/6 ${className ?? ''}`}>
+    <div className={`w-1/6 p-4 ${className ?? ''}`}>
       <Link
         className="w-full p-3 hover:bg-slate-100 inline-flex gap-4 items-center"
         href={'/profile'}>

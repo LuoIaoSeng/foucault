@@ -1,4 +1,5 @@
 import Sidebar from "@/app/components/Sidebar";
+import { Separator } from "@heroui/react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -14,6 +15,7 @@ export default async function () {
   return (
     <div className="w-full min-h-screen flex items-stretch">
       <Sidebar />
+      <Separator orientation="vertical" />
       <main>
 
       </main>
