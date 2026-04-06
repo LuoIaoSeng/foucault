@@ -1,6 +1,10 @@
-import Sidebar from "@/app/components/Sidebar";
+import { Separator } from "@heroui/react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { api } from "../api/user/[[...slug]]/route";
+import EducatorSidebar from "../components/EducatorSidebar";
+import StudentSidebar from "../components/StudentSidebar";
+import EmployeeSidebar from "../components/EmployeeSidebar";
 
 export default async function () {
 
@@ -11,9 +15,23 @@ export default async function () {
     redirect('/login')
   }
 
+  const response = await api.user.get({
+    fetch: {
+      headers: {
+        'Content-Type': 'application/json',
+        'cookie': `auth=${token}`
+      }
+    }
+  })
+
+  const user = response.data
+
   return (
     <div className="w-full min-h-screen flex items-stretch">
-      <Sidebar />
+      {user?.role === 'STUDENT' && <StudentSidebar user={user} />}
+      {user?.role === 'EDUCATOR' && <EducatorSidebar user={user} />}
+      {user?.role === 'EMPLOYEE' && <EmployeeSidebar user={user} />}
+      <Separator orientation="vertical" />
       <main>
 
       </main>

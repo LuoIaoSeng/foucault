@@ -14,7 +14,7 @@ export default function () {
     formData.forEach((value, key) => {
       data[key] = value.toString();
     });
-    
+
     const response = await fetch('/api/auth/login', {
       method: 'post',
       headers: {
@@ -24,8 +24,14 @@ export default function () {
       credentials: 'include'
     })
 
-    if(response.ok) {
-      redirect('/dashboard')
+    if (response.ok) {
+      const data = await response.json()
+      switch (data.role) {
+        case 'ADMIN':
+          redirect('/admin/dashboard')
+        default:
+          redirect('/dashboard')
+      }
     }
   };
 
@@ -36,13 +42,13 @@ export default function () {
           isRequired
           name="username"
           type="text"
-          // validate={(value) => {
-          //   if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-          //     return "Please enter a valid email address";
-          //   }
+        // validate={(value) => {
+        //   if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
+        //     return "Please enter a valid email address";
+        //   }
 
-          //   return null;
-          // }}
+        //   return null;
+        // }}
         >
           <Label>Username</Label>
           <Input placeholder="Enter your username" />
@@ -54,19 +60,19 @@ export default function () {
           minLength={4}
           name="password"
           type="password"
-          // validate={(value) => {
-          //   if (value.length < 8) {
-          //     return "Password must be at least 8 characters";
-          //   }
-          //   if (!/[A-Z]/.test(value)) {
-          //     return "Password must contain at least one uppercase letter";
-          //   }
-          //   if (!/[0-9]/.test(value)) {
-          //     return "Password must contain at least one number";
-          //   }
+        // validate={(value) => {
+        //   if (value.length < 8) {
+        //     return "Password must be at least 8 characters";
+        //   }
+        //   if (!/[A-Z]/.test(value)) {
+        //     return "Password must contain at least one uppercase letter";
+        //   }
+        //   if (!/[0-9]/.test(value)) {
+        //     return "Password must contain at least one number";
+        //   }
 
-          //   return null;
-          // }}
+        //   return null;
+        // }}
         >
           <Label>Password</Label>
           <Input placeholder="Enter your password" />

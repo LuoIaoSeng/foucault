@@ -10,6 +10,13 @@ datasource db {
   provider = "sqlite"
 }
 
+enum Role {
+  STUDENT @map("student")
+  EDUCATOR @map("educator")
+  EMPLOYEE @map("employee")
+  ADMIN @map("admin")
+}
+
 model User {
   id Int @id @default(autoincrement())
   username String @unique
@@ -21,5 +28,6 @@ model User {
   gender String
   birthday DateTime
   createAt DateTime
+  role Role @default(STUDENT)
   updateAt DateTime @updatedAt
 }

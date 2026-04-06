@@ -1,8 +1,11 @@
-import { prisma } from "@/lib/prisma"
-import { treaty } from "@elysiajs/eden"
-import jwt from "@elysiajs/jwt"
-import Elysia, { status, t } from "elysia"
+import { Role } from "@/generated/prisma/enums";
+import { prisma } from "@/lib/prisma";
+import { treaty } from "@elysiajs/eden";
+import jwt from "@elysiajs/jwt";
+import bcrypt, { genSalt } from "bcryptjs";
+import Elysia, { status, t } from "elysia";
 import fs from "node:fs/promises";
+import { get } from "node:http";
 
 
 export const app = new Elysia({ prefix: '/api/user' })
@@ -20,7 +23,7 @@ export const app = new Elysia({ prefix: '/api/user' })
     const verify = await jwt.verify(auth.value as string) as {
       id: number
     }
-    const user = await prisma.user.findUnique({ where: { id: Number(verify.id) } })
+    const user = await prisma.user.findUnique({ where: { id: verify.id } })
     if (!user) {
       return status('Bad Request')
     }
@@ -28,8 +31,26 @@ export const app = new Elysia({ prefix: '/api/user' })
       user
     }
   })
+  .resolve(({ user }) => {
+    return {
+      user
+    }
+  })
   .get('/', async ({ user }) => {
     return user
+  })
+  .put('/', async ({ user, body }) => {
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: body
+    })
+
+    return status('OK')
+  }, {
+    body: t.Object({
+      nickname: t.String()
+    })
   })
   .put('/upload-avator', async ({ user, body }) => {
 
@@ -65,6 +86,117 @@ export const app = new Elysia({ prefix: '/api/user' })
       image: t.File({ format: 'image/*' })
     })
   })
+  .group('/admin', (app) =>
+    app
+      .onBeforeHandle(({ user }) => {
+        if(user.role !== 'ADMIN')
+          return status('Unauthorized')
+      })
+      .get('/all', async () => {
+        const users = await prisma.user.findMany()
+        return users
+      })
+      .get('/show/:id', async ({ params: { id } }) => {
+        const user = await prisma.user.findUnique({ where: { id: parseInt(id) } })
+        if (!user) {
+          return status(404)
+        }
+        return user
+      })
+      .put('/update/:id', async ({ params: { id }, body }) => {
+        await prisma.user.update({
+          where: { id: parseInt(id) }, data: {
+            username: body.username,
+            first_name: body.first_name,
+            last_name: body.last_name,
+            nickname: body.nickname,
+            birthday: new Date(body.birthday),
+            gender: body.gender,
+            role: body.role
+          }
+        })
+
+        return status('OK')
+      }, {
+        body: t.Object({
+          username: t.String(),
+          first_name: t.String(),
+          last_name: t.String(),
+          nickname: t.String(),
+          birthday: t.String(),
+          gender: t.String(),
+          role: t.Enum(Role)
+        })
+      })
+      .post('/create', async ({ body }) => {
+        await prisma.user.create({
+          data: {
+            username: body.username,
+            password: await bcrypt.hash(body.password, await genSalt()),
+            first_name: body.first_name,
+            last_name: body.last_name,
+            nickname: body.nickname,
+            role: body.role,
+            gender: body.gender,
+            birthday: new Date(body.birthday || Date.now()),
+            createAt: new Date()
+          }
+        })
+
+        return status('OK')
+      }, {
+        body: t.Object({
+          username: t.String(),
+          password: t.String(),
+          first_name: t.String(),
+          last_name: t.String(),
+          nickname: t.String(),
+          role: t.Enum(Role),
+          gender: t.String(),
+          birthday: t.Optional(t.String())
+        })
+      })
+      .put('/upload-avator/:id', async ({ body, params: { id } }) => {
+
+        const baseUrl = 'storage/'
+        const ext = await body.image.name.split('.').at(-1)
+
+        const fileName = `${baseUrl}${crypto.randomUUID()}.${ext}`
+
+        const arrayBuffer = await body.image.arrayBuffer()
+        const buffer = new Uint8Array(arrayBuffer)
+
+        await fs.writeFile('./public/' + fileName, buffer)
+
+        const user = await prisma.user.findUnique({ where: { id: parseInt(id) } })
+
+        if (!user) {
+          return status('Unauthorized')
+        }
+
+        if (user.avator_path) {
+          try {
+            await fs.rm('./public/' + user.avator_path)
+          } catch (e) {
+
+          }
+        }
+
+        await prisma.user.update({
+          where: {
+            id: user.id
+          },
+          data: {
+            avator_path: fileName
+          }
+        })
+        return status('OK')
+      }, {
+        body: t.Object({
+          image: t.File({ format: 'image/*' })
+        })
+      })
+  )
 
 export const GET = app.fetch
 export const POST = app.fetch

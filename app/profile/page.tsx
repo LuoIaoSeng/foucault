@@ -1,9 +1,12 @@
-import { Avatar } from "@heroui/react";
+import { Separator } from "@heroui/react";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { redirect, unauthorized } from "next/navigation";
+import AdminSidebar from "../admin/AdminSidebar";
 import { api } from "../api/user/[[...slug]]/route";
-import Sidebar from "../components/Sidebar";
 import ProfileForm from "./ProfileForm";
+import EducatorSidebar from "../components/EducatorSidebar";
+import EmployeeSidebar from "../components/EmployeeSidebar";
+import StudentSidebar from "../components/StudentSidebar";
 
 export default async function () {
 
@@ -18,17 +21,25 @@ export default async function () {
     fetch: {
       headers: {
         'Content-Type': 'application/json',
-        'Cookie': `auth=${token}`
+        'cookie': `auth=${token}`
       }
     }
   })
+
+  if (response.status !== 200) {
+    unauthorized()
+  }
 
   const user = response.data
 
   return (
     <div className="w-full min-h-screen flex items-stretch">
-      <Sidebar />
-      <main className="grow flex flex-col p-4">
+      {user?.role === 'ADMIN' && <AdminSidebar user={user} />}
+      {user?.role === 'STUDENT' && <StudentSidebar user={user} />}
+      {user?.role === 'EDUCATOR' && <EducatorSidebar user={user} />}
+      {user?.role === 'EMPLOYEE' && <EmployeeSidebar user={user} />}
+      <Separator orientation="vertical" />
+      <main className="grow flex flex-col p-6 gap-6">
         <ProfileForm user={user} />
       </main>
     </div>
