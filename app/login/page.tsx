@@ -30,7 +30,7 @@ export default function () {
         case 'ADMIN':
           redirect('/admin/dashboard')
         default:
-          redirect('/dashboard')
+          redirect('/user/dashboard')
       }
     }
   };
