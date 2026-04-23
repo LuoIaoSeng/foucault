@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { api } from "../api/user/[[...slug]]/route";
 import GlobalSidebar from "../GlobalSidebar";
+import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
+
 
 export default async function () {
 
@@ -29,9 +31,8 @@ export default async function () {
       <GlobalSidebar user={user!} />
       <Separator orientation="vertical" />
       <main>
-
+        <SimpleEditor />
       </main>
     </div>
   )
 }
- 

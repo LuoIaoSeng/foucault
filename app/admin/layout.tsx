@@ -1,11 +1,10 @@
 import { Separator } from "@heroui/react";
-import { ReactNode } from "react";
-import Sidebar from "../components/Sidebar";
-import AdminSidebar from "./AdminSidebar";
 import { redirect } from "elysia";
 import { cookies } from "next/headers";
-import { api } from "../api/user/[[...slug]]/route";
 import { unauthorized } from "next/navigation";
+import { ReactNode } from "react";
+import { api } from "../api/user/[[...slug]]/route";
+import AdminSidebar from "./AdminSidebar";
 
 export default async function ({ children }: { children: ReactNode }) {
 
