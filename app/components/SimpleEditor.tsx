@@ -232,18 +232,23 @@ export function SimpleEditor() {
   })
 
   async function handleImageUpload(file: File): Promise<string> {
-    const formData = new FormData()
-    formData.append('image', file)
 
-    const response = await fetch('/api/inbox/upload-image', {
-      method: 'POST',
-      body: formData,
-      credentials: 'include'
-    })
+    const base64 = Buffer.from(await file.arrayBuffer()).toBase64()
 
-    const data = await response.json()
+    return `data:image/png;base64,${base64}`
 
-    return data.path
+    // const formData = new FormData()
+    // formData.append('image', file)
+
+    // const response = await fetch('/api/inbox/upload-image', {
+    //   method: 'POST',
+    //   body: formData,
+    //   credentials: 'include'
+    // })
+
+    // const data = await response.json()
+
+    // return data.path
   }
 
   const rect = useCursorVisibility({

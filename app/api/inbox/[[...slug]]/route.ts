@@ -1,25 +1,12 @@
-import { uploadFile } from "@/lib/filehelper";
 import { treaty } from "@elysiajs/eden";
 import jwt from "@elysiajs/jwt";
-import Elysia, { t } from "elysia";
+import Elysia from "elysia";
 
 export const app = new Elysia({ prefix: '/api/inbox' })
   .use(jwt({
     name: 'jwt',
     secret: process.env.JWT_KEY!
   }))
-  .post('/upload-image', async ({ body }) => {
-
-    const filePath = await uploadFile(body.image)
-
-    return {
-      path: '/' + filePath
-    }
-  }, {
-    body: t.Object({
-      image: t.File({ format: 'image/*' })
-    })
-  })
 
 export const GET = app.fetch
 export const POST = app.fetch
