@@ -21,7 +21,7 @@ export default async function () {
 
   return (
     <>
-      <h1 className="text-2xl font-bold">Users Panel</h1>
+      <h1 className="text-2xl font-bold">Users</h1>
       <Separator />
       <UserTable users={users.data!} />
     </>
