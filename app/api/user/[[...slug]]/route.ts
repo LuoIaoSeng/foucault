@@ -5,8 +5,6 @@ import jwt from "@elysiajs/jwt";
 import bcrypt, { genSalt } from "bcryptjs";
 import Elysia, { status, t } from "elysia";
 import fs from "node:fs/promises";
-import { get } from "node:http";
-
 
 export const app = new Elysia({ prefix: '/api/user' })
   .use(jwt({

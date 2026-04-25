@@ -1,7 +1,7 @@
 'use client'
 
 import { User } from "@/generated/prisma/client";
-import { getDateString } from "@/lib/date";
+import { getDateString } from "@/lib/datehelper";
 import { Camera } from '@gravity-ui/icons';
 import { Avatar, Badge, Button, DateField, Description, ErrorMessage, FieldError, Input, Label, Radio, RadioGroup, TextField, toast } from "@heroui/react";
 import { parseDate } from "@internationalized/date";

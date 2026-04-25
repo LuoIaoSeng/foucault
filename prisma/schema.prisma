@@ -27,7 +27,22 @@ model User {
   avator_path String?
   gender String
   birthday DateTime
-  createAt DateTime
   role Role @default(STUDENT)
+  createAt DateTime @default(now())
   updateAt DateTime @updatedAt
+
+  SendMessages InboxMessage[] @relation("FromUser")
+  ReceiveMessages InboxMessage[] @relation("ToUser")
+}
+
+model InboxMessage {
+  id Int @id @default(autoincrement())
+  fromUserId Int
+  toUserId Int
+  content Json
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  
+  FromUser User @relation(name: "FromUser", fields: [fromUserId], references: [id])
+  ToUser User @relation(name: "ToUser", fields: [toUserId], references: [id])
 }

@@ -1,10 +1,10 @@
 import { Separator } from "@heroui/react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { api } from "../api/user/[[...slug]]/route";
-import EducatorSidebar from "../components/EducatorSidebar";
-import StudentSidebar from "../components/StudentSidebar";
-import EmployeeSidebar from "../components/EmployeeSidebar";
+import { api } from "../../api/user/[[...slug]]/route";
+import EducatorSidebar from "../../components/EducatorSidebar";
+import StudentSidebar from "../../components/StudentSidebar";
+import EmployeeSidebar from "../../components/EmployeeSidebar";
 
 export default async function () {
 
@@ -25,6 +25,10 @@ export default async function () {
   })
 
   const user = response.data
+
+  if(user?.role === 'ADMIN') {
+    redirect('/admin/dashboard')
+  }
 
   return (
     <div className="w-full min-h-screen flex items-stretch">
