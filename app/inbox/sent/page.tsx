@@ -2,10 +2,19 @@
 
 import { SimpleEditor } from "@/app/components/SimpleEditor";
 import { PlanetEarth, Plus, Rocket, ShoppingBag, SquareArticle } from '@gravity-ui/icons';
-import { Button, Description, FieldError, Input, Label, Separator, TagGroup, TextField, Tag } from "@heroui/react";
+import { Button, Description, FieldError, Input, Label, Separator, TagGroup, TextField, Tag, Avatar, Key, useListData } from "@heroui/react";
 import { PersonPlus } from '@gravity-ui/icons';
+import { User } from "@/generated/prisma/client";
 
 export default function () {
+
+  const recieverList = useListData<User>({
+    getKey: (item) => item.id
+  })
+
+  function onRemove(keys: Set<Key>) {
+    recieverList.remove(...keys)
+  }
 
   return (
     <>
@@ -17,24 +26,17 @@ export default function () {
       <Separator />
       <div className="flex flex-col items-center grow gap-4">
         <div className="w-full">
-          <TagGroup selectionMode="single">
+          <TagGroup
+            onRemove={onRemove}
+          >
             <Label>Recievers</Label>
             <TagGroup.List>
               <Tag>
-                <SquareArticle />
-                News
-              </Tag>
-              <Tag>
-                <PlanetEarth />
-                Travel
-              </Tag>
-              <Tag>
-                <Rocket />
-                Gaming
-              </Tag>
-              <Tag>
-                <ShoppingBag />
-                Shopping
+                <Avatar className="size-4" size="sm">
+                  {/* <Avatar.Image src={user.avatar} /> */}
+                  <Avatar.Fallback>R</Avatar.Fallback>
+                </Avatar>
+                name
               </Tag>
             </TagGroup.List>
           </TagGroup>
