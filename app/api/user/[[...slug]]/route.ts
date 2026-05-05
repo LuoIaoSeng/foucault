@@ -2,6 +2,7 @@ import { Role } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 import { treaty } from "@elysiajs/eden";
 import jwt from "@elysiajs/jwt";
+import { pasteRegex } from "@tiptap/extension-highlight";
 import bcrypt, { genSalt } from "bcryptjs";
 import Elysia, { status, t } from "elysia";
 import fs from "node:fs/promises";
@@ -34,8 +35,24 @@ export const app = new Elysia({ prefix: '/api/user' })
       user
     }
   })
+  .get('/users', async () => {
+
+    const users = await prisma.user.findMany()
+
+    return users.map((user) => {
+      return {
+        id: user.id,
+        username: user.username,
+        nickname: user.nickname,
+        avatorPath: user.avatorPath,
+        firstname: user.firstname,
+        lastname: user.lastname,
+      }
+    })
+  })
   .get('/', async ({ user }) => {
-    return user
+    const t = { ...user, password: '' }
+    return t
   })
   .put('/', async ({ user, body }) => {
 
@@ -62,11 +79,11 @@ export const app = new Elysia({ prefix: '/api/user' })
 
     await fs.writeFile('./public/' + fileName, buffer)
 
-    if (user.avator_path) {
+    if (user.avatorPath) {
       try {
-        await fs.rm('./public/' + user.avator_path)
+        await fs.rm('./public/' + user.avatorPath)
       } catch (e) {
-
+        console.error(e)
       }
     }
 
@@ -75,7 +92,7 @@ export const app = new Elysia({ prefix: '/api/user' })
         id: user.id
       },
       data: {
-        avator_path: fileName
+        avatorPath: fileName
       }
     })
     return status('OK')
@@ -87,7 +104,7 @@ export const app = new Elysia({ prefix: '/api/user' })
   .group('/admin', (app) =>
     app
       .onBeforeHandle(({ user }) => {
-        if(user.role !== 'ADMIN')
+        if (user.role !== 'ADMIN')
           return status('Unauthorized')
       })
       .get('/all', async () => {
@@ -105,8 +122,8 @@ export const app = new Elysia({ prefix: '/api/user' })
         await prisma.user.update({
           where: { id: parseInt(id) }, data: {
             username: body.username,
-            first_name: body.first_name,
-            last_name: body.last_name,
+            firstname: body.firstname,
+            lastname: body.lastname,
             nickname: body.nickname,
             birthday: new Date(body.birthday),
             gender: body.gender,
@@ -118,8 +135,8 @@ export const app = new Elysia({ prefix: '/api/user' })
       }, {
         body: t.Object({
           username: t.String(),
-          first_name: t.String(),
-          last_name: t.String(),
+          firstname: t.String(),
+          lastname: t.String(),
           nickname: t.String(),
           birthday: t.String(),
           gender: t.String(),
@@ -131,8 +148,8 @@ export const app = new Elysia({ prefix: '/api/user' })
           data: {
             username: body.username,
             password: await bcrypt.hash(body.password, await genSalt()),
-            first_name: body.first_name,
-            last_name: body.last_name,
+            firstname: body.firstname,
+            lastname: body.lastname,
             nickname: body.nickname,
             role: body.role,
             gender: body.gender,
@@ -146,8 +163,8 @@ export const app = new Elysia({ prefix: '/api/user' })
         body: t.Object({
           username: t.String(),
           password: t.String(),
-          first_name: t.String(),
-          last_name: t.String(),
+          firstname: t.String(),
+          lastname: t.String(),
           nickname: t.String(),
           role: t.Enum(Role),
           gender: t.String(),
@@ -172,9 +189,9 @@ export const app = new Elysia({ prefix: '/api/user' })
           return status('Unauthorized')
         }
 
-        if (user.avator_path) {
+        if (user.avatorPath) {
           try {
-            await fs.rm('./public/' + user.avator_path)
+            await fs.rm('./public/' + user.avatorPath)
           } catch (e) {
 
           }
@@ -185,7 +202,7 @@ export const app = new Elysia({ prefix: '/api/user' })
             id: user.id
           },
           data: {
-            avator_path: fileName
+            avatorPath: fileName
           }
         })
         return status('OK')

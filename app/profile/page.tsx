@@ -40,6 +40,12 @@ export default async function () {
       {user?.role === 'EMPLOYEE' && <EmployeeSidebar user={user} />}
       <Separator orientation="vertical" />
       <main className="grow flex flex-col p-6 gap-6">
+        <div className="flex justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Profile</h1>
+          </div>
+        </div>
+        <Separator />
         <ProfileForm user={user} />
       </main>
     </div>

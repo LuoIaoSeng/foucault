@@ -55,11 +55,11 @@ export default function ({ user }: {
     <div className={`w-1/6 p-6 flex flex-col gap-8`}>
       <div className="flex items-center gap-4">
         <Avatar>
-          <Avatar.Image alt={`${user?.first_name ?? ''} ${user?.last_name}`} src={'/' + (user?.avator_path ?? '')} />
-          <Avatar.Fallback>{`${user?.first_name?.at(0) ?? ''}${user?.last_name?.at(0) ?? ''}`}</Avatar.Fallback>
+          <Avatar.Image alt={`${user?.firstname ?? ''} ${user?.lastname}`} src={'/' + (user?.avatorPath ?? '')} />
+          <Avatar.Fallback>{`${user?.firstname?.at(0) ?? ''}${user?.lastname?.at(0) ?? ''}`}</Avatar.Fallback>
         </Avatar>
         <div className="flex flex-col">
-          <Label>{user?.first_name} {user?.last_name}</Label>
+          <Label>{user?.firstname} {user?.lastname}</Label>
           <Description>{user?.username}</Description>
         </div>
       </div>

@@ -16,8 +16,8 @@ export default function ({ user }: {
   const router = useRouter()
 
   const [nickname, setNickname] = useState(user?.nickname ?? '')
-  const [firstname, setFirstname] = useState(user?.first_name ?? '')
-  const [lastname, setLastname] = useState(user?.last_name ?? '')
+  const [firstname, setFirstname] = useState(user?.firstname ?? '')
+  const [lastname, setLastname] = useState(user?.lastname ?? '')
   const [birthday, setBirthday] = useState<DateValue | null>(parseDate(getDateString(user?.birthday!)))
   const [gender, setGender] = useState(user?.gender ?? '')
   const [username, setUsername] = useState(user?.username ?? '')
@@ -61,15 +61,15 @@ export default function ({ user }: {
       <div className="flex items-center gap-6">
         <Badge.Anchor>
           <Avatar className="size-24 cursor-pointer hover:brightness-75" variant="default" onClick={inputFile}>
-            <Avatar.Image alt={`${user?.first_name ?? ''} ${user?.last_name}`} src={'/' + (user?.avator_path ?? '')} />
-            <Avatar.Fallback className="text-4xl">{`${user?.first_name?.at(0) ?? ''}${user?.last_name?.at(0) ?? ''}`}</Avatar.Fallback>
+            <Avatar.Image alt={`${user?.firstname ?? ''} ${user?.lastname}`} src={'/' + (user?.avatorPath ?? '')} />
+            <Avatar.Fallback className="text-4xl">{`${user?.firstname?.at(0) ?? ''}${user?.lastname?.at(0) ?? ''}`}</Avatar.Fallback>
           </Avatar>
           <Badge placement="bottom-right" size="lg">
             <Camera />
           </Badge>
         </Badge.Anchor>
         <div className="flex flex-col">
-          <Label className="text-4xl">{user?.first_name} {user?.last_name}</Label>
+          <Label className="text-4xl">{user?.firstname} {user?.lastname}</Label>
           <Description className="text-2xl">{user?.username}</Description>
         </div>
       </div>
@@ -154,12 +154,12 @@ export default function ({ user }: {
         </RadioGroup>
         <Button
           onPress={async () => {
-            const response = await fetch(`/api/user/update/${user?.id}`, {
+            const response = await fetch(`/api/user/admin/update/${user?.id}`, {
               method: 'put',
               body: JSON.stringify({
                 nickname,
-                first_name: firstname,
-                last_name: lastname,
+                firstname: firstname,
+                lastname: lastname,
                 username,
                 birthday: birthday?.toString(),
                 role,

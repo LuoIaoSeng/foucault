@@ -82,15 +82,15 @@ export default function ({ users }: {
                   <Table.Cell>{user.nickname}</Table.Cell>
                   <Table.Cell className={`flex items-center gap-2`}>
                     <Avatar>
-                      <Avatar.Image alt={`${user?.first_name ?? ''} ${user?.last_name}`} src={'/' + (user?.avator_path ?? '')} />
-                      <Avatar.Fallback>{`${user?.first_name?.at(0) ?? ''}${user?.last_name?.at(0) ?? ''}`}</Avatar.Fallback>
+                      <Avatar.Image alt={`${user?.firstname ?? ''} ${user?.lastname}`} src={'/' + (user?.avatorPath ?? '')} />
+                      <Avatar.Fallback>{`${user?.firstname?.at(0) ?? ''}${user?.lastname?.at(0) ?? ''}`}</Avatar.Fallback>
                     </Avatar>
                     <div>
                       {user.username}
                     </div>
                   </Table.Cell>
-                  <Table.Cell>{user.first_name}</Table.Cell>
-                  <Table.Cell>{user.last_name}</Table.Cell>
+                  <Table.Cell>{user.firstname}</Table.Cell>
+                  <Table.Cell>{user.lastname}</Table.Cell>
                   <Table.Cell>
                     <Chip
                       color={statusColorMap[user.role]} size="sm" variant="primary">

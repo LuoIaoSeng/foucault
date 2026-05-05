@@ -123,14 +123,14 @@ export default function () {
               </Button>
               <Button
                 onPress={async () => {
-                  const response = await fetch('/api/user/create', {
+                  const response = await fetch('/api/admin/user/create', {
                     method: 'post',
                     body: JSON.stringify({
                       username,
                       password,
                       nickname,
-                      first_name: firstname,
-                      last_name: lastname,
+                      firstname: firstname,
+                      lastname: lastname,
                       role,
                       gender,
                       birthday

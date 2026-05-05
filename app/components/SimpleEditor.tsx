@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { Ref, useEffect, useImperativeHandle, useRef, useState } from "react"
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
 
 // --- Tiptap Core Extensions ---
@@ -183,13 +183,21 @@ const MobileToolbarContent = ({
   </>
 )
 
-export function SimpleEditor() {
+export function SimpleEditor({ ref }: { ref: Ref<any> }) {
   const isMobile = useIsBreakpoint()
   const { height } = useWindowSize()
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
     "main"
   )
   const toolbarRef = useRef<HTMLDivElement>(null)
+
+  useImperativeHandle(ref, () => {
+    return {
+      getContent: () => {
+        return editor?.getHTML()
+      }
+    }
+  })
 
   const editor = useEditor({
     immediatelyRender: false,
