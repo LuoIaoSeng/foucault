@@ -64,9 +64,9 @@ export default function ({ users }: {
         </SearchField>
         <AddUserForm />
       </div>
-      <Table>
-        <Table.ResizableContainer>
-          <Table.Content aria-label="Table with pagination" className="w-full">
+      <Table variant="secondary">
+        <Table.ResizableContainer className="overflow-x-hidden">
+          <Table.Content aria-label="Table with pagination" className="min-w-150">
             <Table.Header columns={columns}>
               {(column) => (
                 <Table.Column isRowHeader={column.id === "id"}>

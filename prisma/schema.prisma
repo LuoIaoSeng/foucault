@@ -42,7 +42,7 @@ model SendMessage {
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
 
-  fromUser      User           @relation(fields: [userId], references: [id])
+  user      User           @relation(fields: [userId], references: [id])
   inboxMessages InboxMessage[]
 }
 

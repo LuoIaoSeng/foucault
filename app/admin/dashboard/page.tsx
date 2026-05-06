@@ -1,6 +1,4 @@
 import { api } from "@/app/api/user/[[...slug]]/route";
-import Sidebar from "@/app/components/Sidebar";
-import { Separator } from "@heroui/react";
 import { cookies } from "next/headers";
 import { redirect, unauthorized } from "next/navigation";
 
