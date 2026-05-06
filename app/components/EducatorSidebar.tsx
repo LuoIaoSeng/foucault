@@ -23,7 +23,7 @@ const items = [
         Dashboard
       </span>
     ),
-    link: '/dashboard'
+    link: '/user/dashboard'
   },
   {
     text: (
