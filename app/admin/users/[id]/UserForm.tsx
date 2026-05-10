@@ -194,10 +194,22 @@ export default function UserForm({ user }: { user: User | null }) {
           </TextField>
           <RadioGroup value={role} onChange={setRole} orientation="horizontal">
             <Label>Role</Label>
-            <Radio value="STUDENT">Student</Radio>
-            <Radio value="EDUCATOR">Educator</Radio>
-            <Radio value="EMPLOYEE">Employee</Radio>
-            <Radio value="ADMIN">Admin</Radio>
+            <Radio value="STUDENT">
+              <Radio.Control><Radio.Indicator /></Radio.Control>
+              <Radio.Content><Label>Student</Label></Radio.Content>
+            </Radio>
+            <Radio value="EDUCATOR">
+              <Radio.Control><Radio.Indicator /></Radio.Control>
+              <Radio.Content><Label>Educator</Label></Radio.Content>
+            </Radio>
+            <Radio value="EMPLOYEE">
+              <Radio.Control><Radio.Indicator /></Radio.Control>
+              <Radio.Content><Label>Employee</Label></Radio.Content>
+            </Radio>
+            <Radio value="ADMIN">
+              <Radio.Control><Radio.Indicator /></Radio.Control>
+              <Radio.Content><Label>Admin</Label></Radio.Content>
+            </Radio>
           </RadioGroup>
           <DateField
             className="max-w-md"
@@ -217,8 +229,14 @@ export default function UserForm({ user }: { user: User | null }) {
             orientation="horizontal"
           >
             <Label>Gender</Label>
-            <Radio value="M">Male</Radio>
-            <Radio value="F">Female</Radio>
+            <Radio value="M">
+              <Radio.Control><Radio.Indicator /></Radio.Control>
+              <Radio.Content><Label>Male</Label></Radio.Content>
+            </Radio>
+            <Radio value="F">
+              <Radio.Control><Radio.Indicator /></Radio.Control>
+              <Radio.Content><Label>Female</Label></Radio.Content>
+            </Radio>
           </RadioGroup>
           <div>
             <Button onPress={handleSave} isDisabled={isSaving}>
