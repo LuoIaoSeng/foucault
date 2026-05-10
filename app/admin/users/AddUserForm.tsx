@@ -8,6 +8,7 @@ import {
   Modal,
   Radio,
   RadioGroup,
+  Separator,
   TextField,
   toast,
 } from "@heroui/react";
@@ -84,7 +85,7 @@ export default function AddUserForm({
       </Button>
       <Modal.Backdrop>
         <Modal.Container placement="auto">
-          <Modal.Dialog className="sm:max-w-md">
+          <Modal.Dialog className="sm:max-w-xl">
             <Modal.CloseTrigger />
             <Modal.Header>
               <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
@@ -92,89 +93,132 @@ export default function AddUserForm({
               </Modal.Icon>
               <Modal.Heading>Add New User</Modal.Heading>
             </Modal.Header>
-            <Modal.Body className="p-6 flex flex-col gap-4">
-              <div className="flex gap-4">
-                <TextField
-                  className="flex-1"
-                  value={firstname}
-                  onChange={setFirstname}
-                  isRequired
-                >
-                  <Label>First Name</Label>
-                  <Input placeholder="First name" />
-                </TextField>
-                <TextField
-                  className="flex-1"
-                  value={lastname}
-                  onChange={setLastname}
-                  isRequired
-                >
-                  <Label>Last Name</Label>
-                  <Input placeholder="Last name" />
-                </TextField>
+
+            <Modal.Body className="p-8">
+              {/* Account section */}
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold text-(--tt-color-text-gray) uppercase tracking-wider mb-4">
+                  Account
+                </h4>
+                <div className="flex gap-4">
+                  <TextField
+                    className="flex-1"
+                    value={username}
+                    onChange={setUsername}
+                    isRequired
+                  >
+                    <Label>Username</Label>
+                    <Input placeholder="Username" />
+                  </TextField>
+                  <TextField
+                    className="flex-1"
+                    type="password"
+                    value={password}
+                    onChange={setPassword}
+                    isRequired
+                  >
+                    <Label>Password</Label>
+                    <Input placeholder="Password" />
+                  </TextField>
+                </div>
               </div>
-              <TextField value={nickname} onChange={setNickname}>
-                <Label>Nickname</Label>
-                <Input placeholder="Nickname" />
-              </TextField>
-              <TextField value={username} onChange={setUsername} isRequired>
-                <Label>Username</Label>
-                <Input placeholder="Username" />
-              </TextField>
-              <TextField
-                type="password"
-                value={password}
-                onChange={setPassword}
-                isRequired
-              >
-                <Label>Password</Label>
-                <Input placeholder="Password" />
-              </TextField>
-              <RadioGroup value={role} onChange={setRole} orientation="horizontal">
-                <Label>Role</Label>
-                <Radio value="STUDENT">
-                  <Radio.Control><Radio.Indicator /></Radio.Control>
-                  <Radio.Content><Label>Student</Label></Radio.Content>
-                </Radio>
-                <Radio value="EDUCATOR">
-                  <Radio.Control><Radio.Indicator /></Radio.Control>
-                  <Radio.Content><Label>Educator</Label></Radio.Content>
-                </Radio>
-                <Radio value="EMPLOYEE">
-                  <Radio.Control><Radio.Indicator /></Radio.Control>
-                  <Radio.Content><Label>Employee</Label></Radio.Content>
-                </Radio>
-                <Radio value="ADMIN">
-                  <Radio.Control><Radio.Indicator /></Radio.Control>
-                  <Radio.Content><Label>Admin</Label></Radio.Content>
-                </Radio>
-              </RadioGroup>
-              <RadioGroup
-                value={gender}
-                onChange={setGender}
-                orientation="horizontal"
-              >
-                <Label>Gender</Label>
-                <Radio value="M">
-                  <Radio.Control><Radio.Indicator /></Radio.Control>
-                  <Radio.Content><Label>Male</Label></Radio.Content>
-                </Radio>
-                <Radio value="F">
-                  <Radio.Control><Radio.Indicator /></Radio.Control>
-                  <Radio.Content><Label>Female</Label></Radio.Content>
-                </Radio>
-              </RadioGroup>
-              <TextField value={birthday} onChange={setBirthday} type="date">
-                <Label>Date of Birth</Label>
-                <Input />
-              </TextField>
+
+              <Separator />
+
+              {/* Personal section */}
+              <div className="my-6">
+                <h4 className="text-sm font-semibold text-(--tt-color-text-gray) uppercase tracking-wider mb-4">
+                  Personal
+                </h4>
+                <div className="flex flex-col gap-4">
+                  <div className="flex gap-4">
+                    <TextField
+                      className="flex-1"
+                      value={firstname}
+                      onChange={setFirstname}
+                      isRequired
+                    >
+                      <Label>First Name</Label>
+                      <Input placeholder="First name" />
+                    </TextField>
+                    <TextField
+                      className="flex-1"
+                      value={lastname}
+                      onChange={setLastname}
+                      isRequired
+                    >
+                      <Label>Last Name</Label>
+                      <Input placeholder="Last name" />
+                    </TextField>
+                  </div>
+                  <TextField value={nickname} onChange={setNickname}>
+                    <Label>Nickname</Label>
+                    <Input placeholder="Nickname (optional)" />
+                  </TextField>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Role & gender section */}
+              <div className="mt-6 flex flex-col gap-6">
+                <div className="flex gap-8">
+                  <RadioGroup
+                    className="flex-1"
+                    value={gender}
+                    onChange={setGender}
+                    orientation="horizontal"
+                  >
+                    <Label>Gender</Label>
+                    <Radio value="M">
+                      <Radio.Control><Radio.Indicator /></Radio.Control>
+                      <Radio.Content><Label>Male</Label></Radio.Content>
+                    </Radio>
+                    <Radio value="F">
+                      <Radio.Control><Radio.Indicator /></Radio.Control>
+                      <Radio.Content><Label>Female</Label></Radio.Content>
+                    </Radio>
+                  </RadioGroup>
+
+                  <TextField
+                    className="flex-1"
+                    value={birthday}
+                    onChange={setBirthday}
+                    type="date"
+                  >
+                    <Label>Date of Birth</Label>
+                    <Input />
+                  </TextField>
+                </div>
+
+                <RadioGroup
+                  value={role}
+                  onChange={setRole}
+                  orientation="horizontal"
+                >
+                  <Label>Role</Label>
+                  <Radio value="STUDENT">
+                    <Radio.Control><Radio.Indicator /></Radio.Control>
+                    <Radio.Content><Label>Student</Label></Radio.Content>
+                  </Radio>
+                  <Radio value="EDUCATOR">
+                    <Radio.Control><Radio.Indicator /></Radio.Control>
+                    <Radio.Content><Label>Educator</Label></Radio.Content>
+                  </Radio>
+                  <Radio value="EMPLOYEE">
+                    <Radio.Control><Radio.Indicator /></Radio.Control>
+                    <Radio.Content><Label>Employee</Label></Radio.Content>
+                  </Radio>
+                  <Radio value="ADMIN">
+                    <Radio.Control><Radio.Indicator /></Radio.Control>
+                    <Radio.Content><Label>Admin</Label></Radio.Content>
+                  </Radio>
+                </RadioGroup>
+              </div>
             </Modal.Body>
-            <Modal.Footer>
-              <Button
-                slot="close"
-                variant="secondary"
-                onPress={reset}
-              >
+
+            <Modal.Footer className="px-8 pb-6">
+              <Button slot="close" variant="secondary" onPress={reset}>
                 Cancel
               </Button>
               <Button
@@ -182,7 +226,7 @@ export default function AddUserForm({
                 isDisabled={loading}
                 onPress={handleCreate}
               >
-                {loading ? "Creating..." : "Create"}
+                {loading ? "Creating..." : "Create User"}
               </Button>
             </Modal.Footer>
           </Modal.Dialog>
