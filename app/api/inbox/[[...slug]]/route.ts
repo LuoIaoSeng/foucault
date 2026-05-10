@@ -3,7 +3,7 @@ import { treaty } from "@elysiajs/eden";
 import jwt from "@elysiajs/jwt";
 import { JsonObject } from "@prisma/client/runtime/client";
 import Elysia, { status, t } from "elysia";
-import { title } from "framer-motion/client";
+
 
 export const app = new Elysia({ prefix: '/api/inbox' })
   .use(jwt({
@@ -75,6 +75,22 @@ export const app = new Elysia({ prefix: '/api/inbox' })
       content: mail.message.content as {title: string, content: string},
       date: mail.message.createAt
     }
+  })
+  .get('/sent', async ({ user }) => {
+    const mails = await prisma.sendMessage.findMany({
+      where: { userId: user.id },
+      include: { inboxMessages: { include: { receiveUser: true } } },
+      orderBy: { createAt: 'desc' },
+    })
+    return mails.map((mail) => {
+      const content = mail.content as { title: string; content: string }
+      return {
+        id: mail.id,
+        title: content.title,
+        receivers: mail.inboxMessages.map((im) => im.receiveUser.nickname),
+        date: mail.createAt,
+      }
+    })
   })
   .post('/send', async ({ user, body }) => {
 

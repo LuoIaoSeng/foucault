@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { api } from "../api/user/[[...slug]]/route";
 import GlobalSidebar from "../GlobalSidebar";
+import InboxSidebar from "./InboxSidebar";
 
 
 export default async function ({ children }: { children: React.ReactNode }) {
@@ -29,8 +30,12 @@ export default async function ({ children }: { children: React.ReactNode }) {
     <div className="w-full min-h-screen flex items-stretch">
       <GlobalSidebar user={user!} />
       <Separator orientation="vertical" />
-      <main className="flex flex-col gap-6 grow p-6 max-h-screen overflow-y-scroll">
-        {children}
+      <main className="flex grow max-h-screen overflow-hidden">
+        <InboxSidebar />
+        <Separator orientation="vertical" />
+        <div className="flex flex-col gap-6 grow p-6 max-h-screen overflow-y-scroll">
+          {children}
+        </div>
       </main>
     </div>
   )
