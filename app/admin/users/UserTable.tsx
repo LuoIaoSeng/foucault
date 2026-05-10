@@ -13,8 +13,7 @@ import {
   toast,
 } from "@heroui/react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
-import AddUserForm from "./AddUserForm";
+import { useEffect, useMemo, useState } from "react";
 
 const ROWS_PER_PAGE = 10;
 
@@ -28,6 +27,11 @@ const roleColorMap: Record<string, "accent" | "default" | "warning"> = {
 export default function UserTable({ users: initialUsers }: { users: Array<User> }) {
   const router = useRouter();
   const [users, setUsers] = useState(initialUsers);
+
+  useEffect(() => {
+    setUsers(initialUsers);
+  }, [initialUsers]);
+
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [deleting, setDeleting] = useState<number | null>(null);
@@ -68,22 +72,15 @@ export default function UserTable({ users: initialUsers }: { users: Array<User> 
     setDeleting(null);
   }
 
-  function onAddUser(user: User) {
-    setUsers((prev) => [user, ...prev]);
-  }
-
   return (
     <>
-      <div className="flex items-center justify-between gap-4">
-        <SearchField value={search} onChange={setSearch} className="max-w-xs">
-          <SearchField.Group>
-            <SearchField.SearchIcon />
-            <SearchField.Input placeholder="Search users..." />
-            <SearchField.ClearButton />
-          </SearchField.Group>
-        </SearchField>
-        <AddUserForm onSuccess={onAddUser} />
-      </div>
+      <SearchField value={search} onChange={setSearch} className="max-w-xs">
+        <SearchField.Group>
+          <SearchField.SearchIcon />
+          <SearchField.Input placeholder="Search users..." />
+          <SearchField.ClearButton />
+        </SearchField.Group>
+      </SearchField>
 
       <Table variant="secondary">
         <Table.ResizableContainer className="overflow-x-hidden">

@@ -13,6 +13,7 @@ import {
   toast,
 } from "@heroui/react";
 import { User } from "@/generated/prisma/client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function AddUserForm({
@@ -20,6 +21,7 @@ export default function AddUserForm({
 }: {
   onSuccess?: (user: User) => void;
 }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -70,6 +72,7 @@ export default function AddUserForm({
       const newUser = await response.json();
       toast.success("User created");
       onSuccess?.(newUser);
+      router.refresh();
       reset();
       setOpen(false);
     } else {
