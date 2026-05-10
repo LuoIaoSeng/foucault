@@ -1,28 +1,45 @@
+import { ArrowLeft } from "@gravity-ui/icons";
+import { Button, Separator } from "@heroui/react";
 import { api } from "@/app/api/user/[[...slug]]/route";
-import Sidebar from "@/app/components/Sidebar";
-import { Separator } from "@heroui/react";
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { redirect, unauthorized } from "next/navigation";
 import UserForm from "./UserForm";
 
-export default async function ({ params }: {
-  params: Promise<{ id: string | number }>
+export default async function EditUserPage({
+  params,
+}: {
+  params: Promise<{ id: string | number }>;
 }) {
-
   const cookieStore = await cookies();
-  const token = cookieStore.get('auth')?.value;
+  const token = cookieStore.get("auth")?.value;
 
-  const { id } = await params
+  if (!token) {
+    redirect("/login");
+  }
 
-  const user = await api.user.admin.show({ id }).get({ fetch: { headers: { 'cookie': `auth=${token}` } } })
+  const { id } = await params;
 
-  if(!user.data) {
-    unauthorized()
+  const res = await api.user.admin.show({ id }).get({
+    fetch: { headers: { cookie: `auth=${token}` } },
+  });
+
+  if (!res.data) {
+    unauthorized();
   }
 
   return (
     <>
-      <UserForm user={user.data}/>
+      <div className="flex items-center gap-3">
+        <Link href="/admin/users">
+          <Button isIconOnly variant="ghost" size="sm">
+            <ArrowLeft />
+          </Button>
+        </Link>
+        <h1 className="text-2xl font-bold">Edit User</h1>
+      </div>
+      <Separator />
+      <UserForm user={res.data} />
     </>
-  )
+  );
 }

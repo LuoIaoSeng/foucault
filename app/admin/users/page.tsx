@@ -1,29 +1,30 @@
+import { Separator } from "@heroui/react";
 import { api } from "@/app/api/user/[[...slug]]/route";
 import { cookies } from "next/headers";
-import { redirect, unauthorized } from "next/navigation";
+import { unauthorized } from "next/navigation";
+import AddUserForm from "./AddUserForm";
 import UserTable from "./UserTable";
-import { Separator } from "@heroui/react";
 
-export default async function () {
-
+export default async function UsersPage() {
   const cookieStore = await cookies();
-  const token = cookieStore.get('auth')?.value;
+  const token = cookieStore.get("auth")?.value;
 
-  if (!token) {
-    redirect('/login')
-  }
+  const res = await api.user.admin.all.get({
+    fetch: { headers: { cookie: `auth=${token}` } },
+  });
 
-  const users = await api.user.admin.all.get({ fetch: { headers: { 'cookie': `auth=${token}` } } })
-
-  if (users.status !== 200) {
-    unauthorized()
+  if (res.status !== 200) {
+    unauthorized();
   }
 
   return (
     <>
-      <h1 className="text-2xl font-bold">Users</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Users</h1>
+        <AddUserForm />
+      </div>
       <Separator />
-      <UserTable users={users.data!} />
+      <UserTable users={res.data!} />
     </>
-  )
+  );
 }

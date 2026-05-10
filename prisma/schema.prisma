@@ -11,38 +11,46 @@ datasource db {
 }
 
 enum Role {
-  STUDENT @map("student")
+  STUDENT  @map("student")
   EDUCATOR @map("educator")
   EMPLOYEE @map("employee")
-  ADMIN @map("admin")
+  ADMIN    @map("admin")
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  username String @unique
-  password String
-  first_name String?
-  last_name String
-  nickname String?
-  avator_path String?
-  gender String
-  birthday DateTime
-  role Role @default(STUDENT)
+  id         Int      @id @default(autoincrement())
+  username   String   @unique
+  password   String
+  firstname  String?
+  lastname   String
+  nickname   String?
+  avatorPath String?
+  gender     String
+  birthday   DateTime
+  role       Role     @default(STUDENT)
+  createAt   DateTime @default(now())
+  updateAt   DateTime @updatedAt
+
+  sendMessages  SendMessage[]
+  inboxMessages InboxMessage[]
+}
+
+model SendMessage {
+  id       Int      @id @default(autoincrement())
+  userId   Int
+  content  Json
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
 
-  SendMessages InboxMessage[] @relation("FromUser")
-  ReceiveMessages InboxMessage[] @relation("ToUser")
+  user      User           @relation(fields: [userId], references: [id])
+  inboxMessages InboxMessage[]
 }
 
 model InboxMessage {
-  id Int @id @default(autoincrement())
-  fromUserId Int
-  toUserId Int
-  content Json
-  createAt DateTime @default(now())
-  updateAt DateTime @updatedAt
-  
-  FromUser User @relation(name: "FromUser", fields: [fromUserId], references: [id])
-  ToUser User @relation(name: "ToUser", fields: [toUserId], references: [id])
+  id         Int @id @default(autoincrement())
+  messageId  Int
+  receiverId Int
+
+  receiveUser User        @relation(fields: [receiverId], references: [id])
+  message     SendMessage @relation(fields: [messageId], references: [id])
 }

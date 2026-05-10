@@ -4,6 +4,7 @@ import { redirect, unauthorized } from "next/navigation";
 import { ReactNode } from "react";
 import { api } from "../api/user/[[...slug]]/route";
 import AdminSidebar from "./AdminSidebar";
+import AdminSubSidebar from "./AdminSubSidebar";
 
 export default async function ({ children }: { children: ReactNode }) {
 
@@ -28,8 +29,12 @@ export default async function ({ children }: { children: ReactNode }) {
     <div className="w-full min-h-screen flex items-stretch">
       <AdminSidebar user={user.data} />
       <Separator orientation="vertical" />
-      <main className="flex flex-col gap-6 grow p-6 max-h-screen overflow-y-scroll">
-        {children}
+      <main className="flex grow max-h-screen overflow-hidden">
+        <AdminSubSidebar />
+        <Separator orientation="vertical" />
+        <div className="flex flex-col gap-6 grow p-6 max-h-screen overflow-y-scroll">
+          {children}
+        </div>
       </main>
     </div>
   )
