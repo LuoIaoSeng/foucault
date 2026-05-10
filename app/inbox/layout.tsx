@@ -1,6 +1,6 @@
 import { Separator } from "@heroui/react";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { redirect, unauthorized } from "next/navigation";
 import { api } from "../api/user/[[...slug]]/route";
 import GlobalSidebar from "../GlobalSidebar";
 import InboxSidebar from "./InboxSidebar";
@@ -24,7 +24,11 @@ export default async function ({ children }: { children: React.ReactNode }) {
     }
   })
 
-  const user = response.data
+  if (response.status !== 200) {
+    unauthorized();
+  }
+
+  const user = response.data;
 
   return (
     <div className="w-full min-h-screen flex items-stretch">
