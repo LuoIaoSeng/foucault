@@ -1,23 +1,87 @@
 "use client";
+
 import { Plus } from "@gravity-ui/icons";
-import { TextField, Label, Input, RadioGroup, Radio, Button, Modal, Surface, toast } from "@heroui/react";
-import { useRouter } from "next/navigation";
+import {
+  Button,
+  Input,
+  Label,
+  Modal,
+  Radio,
+  RadioGroup,
+  TextField,
+  toast,
+} from "@heroui/react";
+import { User } from "@/generated/prisma/client";
 import { useState } from "react";
 
-export default function () {
-  const router = useRouter();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [nickname, setNickname] = useState('');
-  const [firstname, setFirstname] = useState('');
-  const [lastname, setLastname] = useState('');
-  const [role, setRole] = useState('STUDENT');
-  const [gender, setGender] = useState('M');
-  const [birthday, setBirthday] = useState('');
+export default function AddUserForm({
+  onSuccess,
+}: {
+  onSuccess?: (user: User) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [role, setRole] = useState<string>("STUDENT");
+  const [gender, setGender] = useState<string>("M");
+  const [birthday, setBirthday] = useState("");
+
+  function reset() {
+    setUsername("");
+    setPassword("");
+    setNickname("");
+    setFirstname("");
+    setLastname("");
+    setRole("STUDENT");
+    setGender("M");
+    setBirthday("");
+  }
+
+  async function handleCreate() {
+    if (!username || !password || !firstname || !lastname) {
+      toast.danger("Please fill in all required fields.");
+      return;
+    }
+
+    setLoading(true);
+    const response = await fetch("/api/user/admin/create", {
+      method: "post",
+      body: JSON.stringify({
+        username,
+        password,
+        nickname,
+        firstname,
+        lastname,
+        role,
+        gender,
+        birthday,
+      }),
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    if (response.ok) {
+      const newUser = await response.json();
+      toast.success("User created");
+      onSuccess?.(newUser);
+      reset();
+      setOpen(false);
+    } else {
+      toast.danger("Failed to create user");
+    }
+    setLoading(false);
+  }
 
   return (
-    <Modal>
-      <Button variant="primary"><Plus /> Add User</Button>
+    <Modal isOpen={open} onOpenChange={setOpen}>
+      <Button variant="primary" onPress={() => setOpen(true)}>
+        <Plus /> Add User
+      </Button>
       <Modal.Backdrop>
         <Modal.Container placement="auto">
           <Modal.Dialog className="sm:max-w-md">
@@ -28,125 +92,79 @@ export default function () {
               </Modal.Icon>
               <Modal.Heading>Add New User</Modal.Heading>
             </Modal.Header>
-            <Modal.Body className="p-6">
-              <Surface variant="default">
-                <form className="flex flex-col gap-4"
-                  onSubmit={(e) => {
-                    e.preventDefault()
-                  }}>
-                  <div className="flex gap-4">
-                    <TextField className="flex-1" value={firstname} onChange={setFirstname}>
-                      <Label>First Name</Label>
-                      <Input placeholder="First name" />
-                    </TextField>
-                    <TextField className="flex-1" value={lastname} onChange={setLastname}>
-                      <Label>Last Name</Label>
-                      <Input placeholder="Last name" />
-                    </TextField>
-                  </div>
-                  <TextField className="w-full" value={nickname} onChange={setNickname}>
-                    <Label>Nickname</Label>
-                    <Input placeholder="Nickname" />
-                  </TextField>
-                  <TextField className="w-full" value={username} onChange={setUsername}>
-                    <Label>Username</Label>
-                    <Input placeholder="Username" />
-                  </TextField>
-                  <TextField className="w-full" type="password" value={password} onChange={setPassword}>
-                    <Label>Password</Label>
-                    <Input placeholder="Password" />
-                  </TextField>
-                  <RadioGroup value={role} onChange={setRole} orientation="horizontal">
-                    <Label className="mb-2">Role</Label>
-                    <Radio value="ADMIN">
-                      <Radio.Control>
-                        <Radio.Indicator />
-                      </Radio.Control>
-                      <Radio.Content>
-                        <Label>Admin</Label>
-                      </Radio.Content>
-                    </Radio>
-                    <Radio value="EDUCATOR">
-                      <Radio.Control>
-                        <Radio.Indicator />
-                      </Radio.Control>
-                      <Radio.Content>
-                        <Label>Educator</Label>
-                      </Radio.Content>
-                    </Radio>
-                    <Radio value="STUDENT">
-                      <Radio.Control>
-                        <Radio.Indicator />
-                      </Radio.Control>
-                      <Radio.Content>
-                        <Label>Student</Label>
-                      </Radio.Content>
-                    </Radio>
-                    <Radio value="EMPLOYEE">
-                      <Radio.Control>
-                        <Radio.Indicator />
-                      </Radio.Control>
-                      <Radio.Content>
-                        <Label>Employee</Label>
-                      </Radio.Content>
-                    </Radio>
-                  </RadioGroup>
-                  <TextField className="w-full" type="date" value={birthday} onChange={setBirthday}>
-                    <Label>Date of birth</Label>
-                    <Input />
-                  </TextField>
-                  <RadioGroup value={gender} onChange={setGender} orientation="horizontal">
-                    <Label>Gender</Label>
-                    <Radio value="M">
-                      <Radio.Control>
-                        <Radio.Indicator />
-                      </Radio.Control>
-                      <Radio.Content>
-                        <Label>Male</Label>
-                      </Radio.Content>
-                    </Radio>
-                    <Radio value="F">
-                      <Radio.Control>
-                        <Radio.Indicator />
-                      </Radio.Control>
-                      <Radio.Content>
-                        <Label>Female</Label>
-                      </Radio.Content>
-                    </Radio>
-                  </RadioGroup>
-                </form>
-              </Surface>
+            <Modal.Body className="p-6 flex flex-col gap-4">
+              <div className="flex gap-4">
+                <TextField
+                  className="flex-1"
+                  value={firstname}
+                  onChange={setFirstname}
+                  isRequired
+                >
+                  <Label>First Name</Label>
+                  <Input placeholder="First name" />
+                </TextField>
+                <TextField
+                  className="flex-1"
+                  value={lastname}
+                  onChange={setLastname}
+                  isRequired
+                >
+                  <Label>Last Name</Label>
+                  <Input placeholder="Last name" />
+                </TextField>
+              </div>
+              <TextField value={nickname} onChange={setNickname}>
+                <Label>Nickname</Label>
+                <Input placeholder="Nickname" />
+              </TextField>
+              <TextField value={username} onChange={setUsername} isRequired>
+                <Label>Username</Label>
+                <Input placeholder="Username" />
+              </TextField>
+              <TextField
+                type="password"
+                value={password}
+                onChange={setPassword}
+                isRequired
+              >
+                <Label>Password</Label>
+                <Input placeholder="Password" />
+              </TextField>
+              <RadioGroup value={role} onChange={setRole} orientation="horizontal">
+                <Label>Role</Label>
+                <Radio value="STUDENT">Student</Radio>
+                <Radio value="EDUCATOR">Educator</Radio>
+                <Radio value="EMPLOYEE">Employee</Radio>
+                <Radio value="ADMIN">Admin</Radio>
+              </RadioGroup>
+              <RadioGroup
+                value={gender}
+                onChange={setGender}
+                orientation="horizontal"
+              >
+                <Label>Gender</Label>
+                <Radio value="M">Male</Radio>
+                <Radio value="F">Female</Radio>
+              </RadioGroup>
+              <TextField value={birthday} onChange={setBirthday} type="date">
+                <Label>Date of Birth</Label>
+                <Input />
+              </TextField>
             </Modal.Body>
             <Modal.Footer>
-              <Button slot="close" variant="secondary">
+              <Button
+                slot="close"
+                variant="secondary"
+                onPress={reset}
+              >
                 Cancel
               </Button>
               <Button
-                onPress={async () => {
-                  const response = await fetch('/api/user/admin/create', {
-                    method: 'post',
-                    body: JSON.stringify({
-                      username,
-                      password,
-                      nickname,
-                      firstname: firstname,
-                      lastname: lastname,
-                      role,
-                      gender,
-                      birthday
-                    }),
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
-                  });
-                  if (response.ok) {
-                    // router.refresh()
-                    location.reload()
-                    toast.success('Create user successfully')
-                  } else {
-                    toast.danger('Create user failed')
-                  }
-                }} slot="close" variant="primary">
-                Create
+                variant="primary"
+                isDisabled={loading}
+                onPress={handleCreate}
+              >
+                {loading ? "Creating..." : "Create"}
               </Button>
             </Modal.Footer>
           </Modal.Dialog>

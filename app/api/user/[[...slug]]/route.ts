@@ -144,7 +144,7 @@ export const app = new Elysia({ prefix: '/api/user' })
         })
       })
       .post('/create', async ({ body }) => {
-        await prisma.user.create({
+        const newUser = await prisma.user.create({
           data: {
             username: body.username,
             password: await bcrypt.hash(body.password, await genSalt()),
@@ -158,7 +158,7 @@ export const app = new Elysia({ prefix: '/api/user' })
           }
         })
 
-        return status('OK')
+        return newUser
       }, {
         body: t.Object({
           username: t.String(),
@@ -170,6 +170,20 @@ export const app = new Elysia({ prefix: '/api/user' })
           gender: t.String(),
           birthday: t.Optional(t.String())
         })
+      })
+      .delete('/delete/:id', async ({ params: { id } }) => {
+        const userId = parseInt(id);
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) {
+          return status(404);
+        }
+        if (user.avatorPath) {
+          try {
+            await fs.rm("./public/" + user.avatorPath);
+          } catch {}
+        }
+        await prisma.user.delete({ where: { id: userId } });
+        return status("OK");
       })
       .put('/upload-avator/:id', async ({ body, params: { id } }) => {
 
@@ -217,6 +231,7 @@ export const GET = app.fetch
 export const POST = app.fetch
 export const PUT = app.fetch
 export const PATCH = app.fetch
+export const DELETE = app.fetch
 
 export const api =
   // process is defined on server side and build time

@@ -3,7 +3,7 @@ import { Button, Separator } from "@heroui/react";
 import { api } from "../api/inbox/[[...slug]]/route";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import Mailtable from "../api/inbox/[[...slug]]/MailTable";
+import Mailtable from "./MailTable";
 
 export default async function () {
   const cookieStore = await cookies();
