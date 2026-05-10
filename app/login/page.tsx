@@ -12,6 +12,7 @@ import {
 } from "@heroui/react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { useState } from "react";
 
 export default function LoginPage() {
@@ -44,7 +45,8 @@ export default function LoginPage() {
       } else {
         toast.danger("Incorrect username or password.");
       }
-    } catch {
+    } catch (e) {
+      if (isRedirectError(e)) throw e;
       toast.danger("Unable to connect. Please try again.");
     } finally {
       setIsLoading(false);
