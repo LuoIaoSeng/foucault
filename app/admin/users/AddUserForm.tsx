@@ -18,8 +18,12 @@ import { useState } from "react";
 
 export default function AddUserForm({
   onSuccess,
+  triggerVariant = "primary",
+  triggerClassName,
 }: {
   onSuccess?: (user: User) => void;
+  triggerVariant?: "primary" | "ghost";
+  triggerClassName?: string;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -83,8 +87,15 @@ export default function AddUserForm({
 
   return (
     <Modal isOpen={open} onOpenChange={setOpen}>
-      <Button variant="primary" onPress={() => setOpen(true)}>
-        <Plus /> Add User
+      <Button
+        variant={triggerVariant}
+        className={triggerClassName}
+        onPress={() => setOpen(true)}
+      >
+        <span className="w-full font-semibold inline-flex items-center gap-3">
+          <Plus />
+          Add User
+        </span>
       </Button>
       <Modal.Backdrop>
         <Modal.Container placement="auto">
