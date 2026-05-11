@@ -1,6 +1,6 @@
 "use client"
 
-import { Ref, useEffect, useImperativeHandle, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
 
 // --- Tiptap Core Extensions ---
@@ -65,7 +65,7 @@ import { useWindowSize } from "@/app/hooks/use-window-size"
 import { useCursorVisibility } from "@/app/hooks/use-cursor-visibility"
 
 // --- Components ---
-// import { ThemeToggle } from "@/app/components/tiptap-templates/simple/theme-toggle"
+import { ThemeToggle } from "@/app/components/tiptap-templates/simple/theme-toggle"
 
 // --- Lib ---
 import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
@@ -147,9 +147,9 @@ const MainToolbarContent = ({
 
       {isMobile && <ToolbarSeparator />}
 
-      {/* <ToolbarGroup>
+      <ToolbarGroup>
         <ThemeToggle />
-      </ToolbarGroup> */}
+      </ToolbarGroup>
     </>
   )
 }
@@ -183,21 +183,13 @@ const MobileToolbarContent = ({
   </>
 )
 
-export function SimpleEditor({ ref }: { ref: Ref<any> }) {
+export function SimpleEditor() {
   const isMobile = useIsBreakpoint()
   const { height } = useWindowSize()
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
     "main"
   )
   const toolbarRef = useRef<HTMLDivElement>(null)
-
-  useImperativeHandle(ref, () => {
-    return {
-      getContent: () => {
-        return editor?.getHTML()
-      }
-    }
-  })
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -236,28 +228,8 @@ export function SimpleEditor({ ref }: { ref: Ref<any> }) {
         onError: (error) => console.error("Upload failed:", error),
       }),
     ],
-    content: ''
+    content,
   })
-
-  async function handleImageUpload(file: File): Promise<string> {
-
-    const base64 = Buffer.from(await file.arrayBuffer()).toBase64()
-
-    return `data:image/png;base64,${base64}`
-
-    // const formData = new FormData()
-    // formData.append('image', file)
-
-    // const response = await fetch('/api/inbox/upload-image', {
-    //   method: 'POST',
-    //   body: formData,
-    //   credentials: 'include'
-    // })
-
-    // const data = await response.json()
-
-    // return data.path
-  }
 
   const rect = useCursorVisibility({
     editor,
@@ -278,8 +250,8 @@ export function SimpleEditor({ ref }: { ref: Ref<any> }) {
           style={{
             ...(isMobile
               ? {
-                bottom: `calc(100% - ${height - rect.y}px)`,
-              }
+                  bottom: `calc(100% - ${height - rect.y}px)`,
+                }
               : {}),
           }}
         >
