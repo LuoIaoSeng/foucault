@@ -33,7 +33,8 @@ model User {
 
   sendMessages  SendMessage[]
   inboxMessages InboxMessage[]
-  courses       Course[]
+  courses       Course[]       @relation("EducatorCourses")
+  taCourses     Course[]       @relation("TaCourses")
   enrollments   Enrollment[]
 }
 
@@ -44,7 +45,7 @@ model SendMessage {
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
 
-  user      User           @relation(fields: [userId], references: [id])
+  user          User           @relation(fields: [userId], references: [id])
   inboxMessages InboxMessage[]
 }
 
@@ -68,7 +69,8 @@ model Course {
   createAt    DateTime @default(now())
   updateAt    DateTime @updatedAt
 
-  educator    User         @relation(fields: [educatorId], references: [id])
+  educator    User         @relation("EducatorCourses", fields: [educatorId], references: [id])
+  tas         User[]       @relation("TaCourses")
   enrollments Enrollment[]
 }
 
