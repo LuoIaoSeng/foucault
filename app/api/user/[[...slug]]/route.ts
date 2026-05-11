@@ -48,8 +48,12 @@ export const app = new Elysia({ prefix: '/api/user' })
         firstname: user.firstname,
         lastname: user.lastname,
         role: user.role,
+        facultyId: user.facultyId,
       }
     })
+  })
+  .get('/faculties', async () => {
+    return prisma.faculty.findMany({ orderBy: { name: "asc" } })
   })
   .get('/', async ({ user }) => {
     const t = { ...user, password: '' }
@@ -109,7 +113,9 @@ export const app = new Elysia({ prefix: '/api/user' })
           return status('Unauthorized')
       })
       .get('/all', async () => {
-        const users = await prisma.user.findMany()
+        const users = await prisma.user.findMany({
+          include: { faculty: true },
+        })
         return users
       })
       .get('/show/:id', async ({ params: { id } }) => {
@@ -128,7 +134,8 @@ export const app = new Elysia({ prefix: '/api/user' })
             nickname: body.nickname,
             birthday: new Date(body.birthday),
             gender: body.gender,
-            role: body.role
+            role: body.role,
+            facultyId: body.facultyId ?? null,
           }
         })
 
@@ -141,7 +148,8 @@ export const app = new Elysia({ prefix: '/api/user' })
           nickname: t.String(),
           birthday: t.String(),
           gender: t.String(),
-          role: t.Enum(Role)
+          role: t.Enum(Role),
+          facultyId: t.Optional(t.Integer()),
         })
       })
       .post('/create', async ({ body }) => {
@@ -154,6 +162,7 @@ export const app = new Elysia({ prefix: '/api/user' })
             nickname: body.nickname,
             role: body.role,
             gender: body.gender,
+            facultyId: body.facultyId ?? null,
             birthday: new Date(body.birthday || Date.now()),
             createAt: new Date()
           }
@@ -169,6 +178,7 @@ export const app = new Elysia({ prefix: '/api/user' })
           nickname: t.String(),
           role: t.Enum(Role),
           gender: t.String(),
+          facultyId: t.Optional(t.Integer()),
           birthday: t.Optional(t.String())
         })
       })

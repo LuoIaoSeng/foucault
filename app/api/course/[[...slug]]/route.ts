@@ -11,6 +11,7 @@ const courseBody = t.Object({
   content: t.Optional(t.Any()),
   semester: t.String(),
   educatorId: t.Integer(),
+  facultyId: t.Optional(t.Integer()),
   taIds: t.Optional(t.Array(t.Integer())),
 });
 
@@ -42,7 +43,7 @@ export const app = new Elysia({ prefix: "/api/course" })
   // List all courses (admin)
   .get("/all", async () => {
     return prisma.course.findMany({
-      include: { educator: true, tas: true, enrollments: true },
+      include: { educator: true, tas: true, faculty: true, enrollments: true },
       orderBy: { createAt: "desc" },
     });
   })
@@ -51,7 +52,7 @@ export const app = new Elysia({ prefix: "/api/course" })
   .get("/teaching", async ({ user }) => {
     return prisma.course.findMany({
       where: { educatorId: user.id },
-      include: { enrollments: true },
+      include: { faculty: true, enrollments: true },
       orderBy: { semester: "desc" },
     });
   })
@@ -72,7 +73,7 @@ export const app = new Elysia({ prefix: "/api/course" })
   .get("/:id", async ({ params: { id } }) => {
     const course = await prisma.course.findUnique({
       where: { id: parseInt(id) },
-      include: { educator: true, tas: true, enrollments: true },
+      include: { educator: true, tas: true, faculty: true, enrollments: true },
     });
     if (!course) return status(404);
     return course;
@@ -90,11 +91,12 @@ export const app = new Elysia({ prefix: "/api/course" })
           content: body.content as JsonObject,
           semester: body.semester,
           educatorId: body.educatorId,
+          facultyId: body.facultyId ?? null,
           tas: body.taIds
             ? { connect: body.taIds.map((id) => ({ id })) }
             : undefined,
         },
-        include: { educator: true, tas: true, enrollments: true },
+        include: { educator: true, tas: true, faculty: true, enrollments: true },
       });
       return course;
     },
@@ -122,6 +124,7 @@ export const app = new Elysia({ prefix: "/api/course" })
         content: body.content as JsonObject,
         semester: body.semester,
         educatorId: body.educatorId,
+        facultyId: body.facultyId ?? null,
       };
 
       if (body.taIds !== undefined) {
@@ -134,7 +137,7 @@ export const app = new Elysia({ prefix: "/api/course" })
       return prisma.course.update({
         where: { id: parseInt(id) },
         data: updateData,
-        include: { educator: true, tas: true, enrollments: true },
+        include: { educator: true, tas: true, faculty: true, enrollments: true },
       });
     },
     { body: courseBody },

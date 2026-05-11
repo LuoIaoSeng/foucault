@@ -3,8 +3,10 @@
 import { Plus } from "@gravity-ui/icons";
 import {
   Button,
+  ComboBox,
   Input,
   Label,
+  ListBox,
   Modal,
   Radio,
   RadioGroup,
@@ -14,7 +16,7 @@ import {
 } from "@heroui/react";
 import { User } from "@/generated/prisma/client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function AddUserForm({
   onSuccess,
@@ -37,6 +39,16 @@ export default function AddUserForm({
   const [role, setRole] = useState<string>("STUDENT");
   const [gender, setGender] = useState<string>("M");
   const [birthday, setBirthday] = useState("");
+  const [facultyId, setFacultyId] = useState<number | null>(null);
+  const [faculties, setFaculties] = useState<
+    Array<{ id: number; code: string; name: string }>
+  >([]);
+
+  useEffect(() => {
+    fetch("/api/user/faculties")
+      .then((r) => r.json())
+      .then((data) => setFaculties(data));
+  }, []);
 
   function reset() {
     setUsername("");
@@ -47,6 +59,7 @@ export default function AddUserForm({
     setRole("STUDENT");
     setGender("M");
     setBirthday("");
+    setFacultyId(null);
   }
 
   async function handleCreate() {
@@ -67,6 +80,7 @@ export default function AddUserForm({
         role,
         gender,
         birthday,
+        facultyId,
       }),
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -193,6 +207,31 @@ export default function AddUserForm({
                       <Radio.Content><Label>Female</Label></Radio.Content>
                     </Radio>
                   </RadioGroup>
+
+                  <ComboBox
+                    selectedKey={facultyId}
+                    onSelectionChange={(k) => setFacultyId(k as number | null)}
+                  >
+                    <Label>Faculty (optional)</Label>
+                    <ComboBox.InputGroup>
+                      <Input placeholder="Select faculty..." />
+                      <ComboBox.Trigger />
+                    </ComboBox.InputGroup>
+                    <ComboBox.Popover>
+                      <ListBox>
+                        {faculties.map((f) => (
+                          <ListBox.Item key={f.id} id={f.id} textValue={f.name}>
+                            <div className="flex flex-col">
+                              <span>{f.name}</span>
+                              <span className="text-xs text-(--tt-color-text-gray)">
+                                {f.code}
+                              </span>
+                            </div>
+                          </ListBox.Item>
+                        ))}
+                      </ListBox>
+                    </ComboBox.Popover>
+                  </ComboBox>
 
                   <TextField
                     className="flex-1"

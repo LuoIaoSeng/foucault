@@ -39,6 +39,7 @@ export default function CourseForm({
     content: any;
     semester: string;
     educatorId: number;
+    facultyId?: number | null;
     tas?: Array<{ id: number; firstname: string | null; lastname: string; username: string }>;
   };
 }) {
@@ -50,7 +51,11 @@ export default function CourseForm({
   const [description, setDescription] = useState(course.description ?? "");
   const [semester, setSemester] = useState(course.semester);
   const [educatorId, setEducatorId] = useState<number>(course.educatorId);
+  const [facultyId, setFacultyId] = useState<number | null>(course.facultyId ?? null);
   const [users, setUsers] = useState<UserOption[]>([]);
+  const [faculties, setFaculties] = useState<
+    Array<{ id: number; code: string; name: string }>
+  >([]);
   const [isSaving, setIsSaving] = useState(false);
 
   const selectedTAs = useListData<UserOption>({
@@ -67,6 +72,9 @@ export default function CourseForm({
     fetch("/api/user/users")
       .then((r) => r.json())
       .then((data: any[]) => setUsers(data));
+    fetch("/api/user/faculties")
+      .then((r) => r.json())
+      .then((data) => setFaculties(data));
   }, []);
 
   const educators = users.filter(
@@ -93,6 +101,7 @@ export default function CourseForm({
         description,
         semester,
         educatorId,
+        facultyId,
         content: contentJson,
         taIds: selectedTAs.items.map((t) => t.id),
       }),
@@ -173,6 +182,32 @@ export default function CourseForm({
                       </span>
                       <span className="text-xs text-(--tt-color-text-gray)">
                         @{e.username}
+                      </span>
+                    </div>
+                  </ListBox.Item>
+                ))}
+              </ListBox>
+            </ComboBox.Popover>
+          </ComboBox>
+
+          <ComboBox
+            selectedKey={facultyId}
+            onSelectionChange={(k) => setFacultyId(k as number | null)}
+            className="max-w-xs"
+          >
+            <Label>Faculty (optional)</Label>
+            <ComboBox.InputGroup>
+              <Input placeholder="Select faculty..." />
+              <ComboBox.Trigger />
+            </ComboBox.InputGroup>
+            <ComboBox.Popover>
+              <ListBox>
+                {faculties.map((f) => (
+                  <ListBox.Item key={f.id} id={f.id} textValue={f.name}>
+                    <div className="flex flex-col">
+                      <span>{f.name}</span>
+                      <span className="text-xs text-(--tt-color-text-gray)">
+                        {f.code}
                       </span>
                     </div>
                   </ListBox.Item>

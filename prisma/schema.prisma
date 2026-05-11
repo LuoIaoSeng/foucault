@@ -28,9 +28,11 @@ model User {
   gender     String
   birthday   DateTime
   role       Role     @default(STUDENT)
+  facultyId  Int?
   createAt   DateTime @default(now())
   updateAt   DateTime @updatedAt
 
+  faculty       Faculty?       @relation(fields: [facultyId], references: [id])
   sendMessages  SendMessage[]
   inboxMessages InboxMessage[]
   courses       Course[]       @relation("EducatorCourses")
@@ -58,6 +60,17 @@ model InboxMessage {
   message     SendMessage @relation(fields: [messageId], references: [id])
 }
 
+model Faculty {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  name        String
+  description String?
+  createAt    DateTime @default(now())
+
+  users   User[]
+  courses Course[]
+}
+
 model Course {
   id          Int      @id @default(autoincrement())
   code        String   @unique
@@ -66,10 +79,12 @@ model Course {
   content     Json?
   semester    String
   educatorId  Int
+  facultyId   Int?
   createAt    DateTime @default(now())
   updateAt    DateTime @updatedAt
 
   educator    User         @relation("EducatorCourses", fields: [educatorId], references: [id])
+  faculty     Faculty?     @relation(fields: [facultyId], references: [id])
   tas         User[]       @relation("TaCourses")
   enrollments Enrollment[]
 }

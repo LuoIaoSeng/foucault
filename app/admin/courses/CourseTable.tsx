@@ -27,6 +27,7 @@ export default function CourseTable({
     educatorId: number;
     educator: { firstname: string | null; lastname: string; username: string };
     tas?: Array<{ id: number; firstname: string | null; lastname: string }>;
+    faculty?: { id: number; code: string; name: string } | null;
     enrollments: Array<{ id: number }>;
   }>;
 }) {
@@ -93,6 +94,7 @@ export default function CourseTable({
               <Table.Column isRowHeader>Code</Table.Column>
               <Table.Column>Name</Table.Column>
               <Table.Column>Semester</Table.Column>
+              <Table.Column>Faculty</Table.Column>
               <Table.Column>Educator</Table.Column>
               <Table.Column>Students</Table.Column>
               <Table.Column>TAs</Table.Column>
@@ -101,6 +103,7 @@ export default function CourseTable({
             <Table.Body>
               {paginated.length === 0 ? (
                 <Table.Row>
+                  <Table.Cell>{" "}</Table.Cell>
                   <Table.Cell>{" "}</Table.Cell>
                   <Table.Cell>{" "}</Table.Cell>
                   <Table.Cell>{" "}</Table.Cell>
@@ -119,6 +122,7 @@ export default function CourseTable({
                     </Table.Cell>
                     <Table.Cell>{course.name}</Table.Cell>
                     <Table.Cell>{course.semester}</Table.Cell>
+                    <Table.Cell>{course.faculty?.code ?? "—"}</Table.Cell>
                     <Table.Cell>
                       {course.educator?.firstname} {course.educator?.lastname}
                     </Table.Cell>

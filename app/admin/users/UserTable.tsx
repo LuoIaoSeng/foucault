@@ -92,11 +92,13 @@ export default function UserTable({ users: initialUsers }: { users: Array<User> 
               <Table.Column>First Name</Table.Column>
               <Table.Column>Last Name</Table.Column>
               <Table.Column>Role</Table.Column>
+              <Table.Column>Faculty</Table.Column>
               <Table.Column>Actions</Table.Column>
             </Table.Header>
             <Table.Body>
               {paginated.length === 0 ? (
                 <Table.Row>
+                  <Table.Cell>{" "}</Table.Cell>
                   <Table.Cell>{" "}</Table.Cell>
                   <Table.Cell>{" "}</Table.Cell>
                   <Table.Cell>{" "}</Table.Cell>
@@ -132,6 +134,7 @@ export default function UserTable({ users: initialUsers }: { users: Array<User> 
                         {user.role}
                       </Chip>
                     </Table.Cell>
+                    <Table.Cell>{(user as any).faculty?.code ?? "—"}</Table.Cell>
                     <Table.Cell>
                       <div className="flex items-center gap-1">
                         <Button

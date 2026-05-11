@@ -37,7 +37,11 @@ export default function AddCourseForm() {
   const [description, setDescription] = useState("");
   const [semester, setSemester] = useState("");
   const [educatorId, setEducatorId] = useState<number | null>(null);
+  const [facultyId, setFacultyId] = useState<number | null>(null);
   const [users, setUsers] = useState<UserOption[]>([]);
+  const [faculties, setFaculties] = useState<
+    Array<{ id: number; code: string; name: string }>
+  >([]);
 
   const selectedTAs = useListData<UserOption>({
     getKey: (item) => item.id,
@@ -48,6 +52,9 @@ export default function AddCourseForm() {
       fetch("/api/user/users")
         .then((r) => r.json())
         .then((data: any[]) => setUsers(data));
+      fetch("/api/user/faculties")
+        .then((r) => r.json())
+        .then((data) => setFaculties(data));
     }
   }, [open]);
 
@@ -61,6 +68,7 @@ export default function AddCourseForm() {
     setDescription("");
     setSemester("");
     setEducatorId(null);
+    setFacultyId(null);
     selectedTAs.remove(...selectedTAs.items.map((t) => t.id));
   }
 
@@ -79,6 +87,7 @@ export default function AddCourseForm() {
         description,
         semester,
         educatorId,
+        facultyId,
         taIds: selectedTAs.items.map((t) => t.id),
       }),
       headers: { "Content-Type": "application/json" },
@@ -161,6 +170,31 @@ export default function AddCourseForm() {
                           </span>
                           <span className="text-xs text-(--tt-color-text-gray)">
                             @{e.username}
+                          </span>
+                        </div>
+                      </ListBox.Item>
+                    ))}
+                  </ListBox>
+                </ComboBox.Popover>
+              </ComboBox>
+
+              <ComboBox
+                selectedKey={facultyId}
+                onSelectionChange={(k) => setFacultyId(k as number)}
+              >
+                <Label>Faculty (optional)</Label>
+                <ComboBox.InputGroup>
+                  <Input placeholder="Select faculty..." />
+                  <ComboBox.Trigger />
+                </ComboBox.InputGroup>
+                <ComboBox.Popover>
+                  <ListBox>
+                    {faculties.map((f) => (
+                      <ListBox.Item key={f.id} id={f.id} textValue={f.name}>
+                        <div className="flex flex-col">
+                          <span>{f.name}</span>
+                          <span className="text-xs text-(--tt-color-text-gray)">
+                            {f.code}
                           </span>
                         </div>
                       </ListBox.Item>
