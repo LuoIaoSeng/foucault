@@ -65,13 +65,15 @@ function newAnnouncement(): Announcement {
   return { id: crypto.randomUUID(), title: "", content: "", date: new Date().toISOString().slice(0, 10) };
 }
 
-export function ContentEditor({ course }: {
+export function ContentEditor({ course, backUrl, hideBack }: {
   course: {
     id: number; code: string; name: string;
     educatorId: number; semester: string;
     description: string | null; facultyId?: number | null;
     content: any;
   };
+  backUrl?: string;
+  hideBack?: boolean;
 }) {
   const router = useRouter();
   const content = (course.content ?? {}) as CourseContent;
@@ -150,9 +152,11 @@ export function ContentEditor({ course }: {
     <div className="max-w-6xl flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href={`/admin/courses/${course.id}`}>
-            <Button isIconOnly variant="ghost" size="sm"><ArrowLeft /></Button>
-          </Link>
+          {!hideBack && (
+            <Link href={backUrl ?? `/admin/courses/${course.id}`}>
+              <Button isIconOnly variant="ghost" size="sm"><ArrowLeft /></Button>
+            </Link>
+          )}
           <div>
             <h1 className="text-2xl font-bold">Sections</h1>
             <p className="text-sm text-(--tt-color-text-gray)">{course.code} — {course.name}</p>

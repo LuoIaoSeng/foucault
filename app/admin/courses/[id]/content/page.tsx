@@ -1,8 +1,9 @@
 import { Separator } from "@heroui/react";
 import { api } from "@/app/api/course/[[...slug]]/route";
+import { api as userApi } from "@/app/api/user/[[...slug]]/route";
 import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
-import { ContentEditor } from "./ContentEditor";
+import { notFound, unauthorized } from "next/navigation";
+import { ContentEditor } from "@/app/components/ContentEditor";
 
 export default async function CourseContentPage({
   params,
@@ -14,21 +15,34 @@ export default async function CourseContentPage({
 
   const { id } = await params;
 
-  const res = await api.course({ id }).get({
-    fetch: { headers: { cookie: `auth=${token}` } },
-  });
+  const [courseRes, userRes] = await Promise.all([
+    api.course({ id }).get({
+      fetch: { headers: { cookie: `auth=${token}` } },
+    }),
+    userApi.user.get({
+      fetch: { headers: { cookie: `auth=${token}` } },
+    }),
+  ]);
 
-  if (!res.data) notFound();
+  if (!courseRes.data || !userRes.data) notFound();
+
+  const courseData = courseRes.data as any;
+  const user = userRes.data;
+
+  // Only admin or the course's educator can edit content
+  if (user.role !== "ADMIN" && courseData.educatorId !== user.id) {
+    unauthorized();
+  }
 
   const course = {
-    id: (res.data as any).id,
-    code: (res.data as any).code,
-    name: (res.data as any).name,
-    educatorId: (res.data as any).educatorId,
-    semester: (res.data as any).semester,
-    description: (res.data as any).description,
-    facultyId: (res.data as any).facultyId,
-    content: (res.data as any).content,
+    id: courseData.id,
+    code: courseData.code,
+    name: courseData.name,
+    educatorId: courseData.educatorId,
+    semester: courseData.semester,
+    description: courseData.description,
+    facultyId: courseData.facultyId,
+    content: courseData.content,
   };
 
   return (

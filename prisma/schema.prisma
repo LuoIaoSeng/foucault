@@ -35,9 +35,10 @@ model User {
   faculty       Faculty?       @relation(fields: [facultyId], references: [id])
   sendMessages  SendMessage[]
   inboxMessages InboxMessage[]
-  courses       Course[]       @relation("EducatorCourses")
-  taCourses     Course[]       @relation("TaCourses")
-  enrollments   Enrollment[]
+  courses              Course[]               @relation("EducatorCourses")
+  taCourses            Course[]               @relation("TaCourses")
+  enrollments          Enrollment[]
+  assignmentSubmissions AssignmentSubmission[]
 }
 
 model SendMessage {
@@ -85,8 +86,9 @@ model Course {
 
   educator    User         @relation("EducatorCourses", fields: [educatorId], references: [id])
   faculty     Faculty?     @relation(fields: [facultyId], references: [id])
-  tas         User[]       @relation("TaCourses")
-  enrollments Enrollment[]
+  tas                   User[]                   @relation("TaCourses")
+  enrollments           Enrollment[]
+  assignmentSubmissions AssignmentSubmission[]
 }
 
 model Enrollment {
@@ -99,4 +101,19 @@ model Enrollment {
   course Course @relation(fields: [courseId], references: [id])
 
   @@unique([userId, courseId])
+}
+
+model AssignmentSubmission {
+  id           Int      @id @default(autoincrement())
+  assignmentId String
+  courseId     Int
+  userId       Int
+  fileUrl      String
+  fileName     String
+  submittedAt  DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+
+  @@unique([assignmentId, userId])
 }

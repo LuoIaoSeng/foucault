@@ -21,8 +21,8 @@ export default async function ({ children }: { children: ReactNode }) {
     unauthorized()
   }
 
-  if (user.data?.role !== 'ADMIN') {
-    unauthorized()
+  if (user.data?.role !== "ADMIN") {
+    unauthorized();
   }
 
   return (
@@ -30,7 +30,7 @@ export default async function ({ children }: { children: ReactNode }) {
       <AdminSidebar user={user.data} />
       <Separator orientation="vertical" />
       <main className="flex grow max-h-screen overflow-hidden">
-        <AdminSubSidebar />
+        <AdminSubSidebar userRole={user.data?.role} />
         <Separator orientation="vertical" />
         <div className="flex flex-col gap-6 grow p-6 max-h-screen overflow-y-scroll">
           {children}

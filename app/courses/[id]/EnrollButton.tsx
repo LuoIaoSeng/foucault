@@ -16,7 +16,7 @@ export default function EnrollButton({
 
   async function handleEnroll() {
     setLoading(true);
-    const res = await fetch(`/api/course/enroll/${courseId}`, {
+    const res = await fetch(`/api/course/${courseId}/enroll`, {
       method: "post",
       credentials: "include",
     });
