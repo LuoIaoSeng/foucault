@@ -1,21 +1,25 @@
 "use client";
 
-import { Persons } from "@gravity-ui/icons";
+import { Books, Persons } from "@gravity-ui/icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import AddUserForm from "./users/AddUserForm";
+
+const linkClasses = (active: boolean) =>
+  `button w-full ${active ? "button--tertiary" : "button--ghost"}`;
 
 export default function AdminSubSidebar() {
   const pathname = usePathname();
 
   return (
     <div className="w-44 shrink-0 flex flex-col gap-1 p-4">
-      <Link
-        href="/admin/users"
-        className={`button w-full ${
-          pathname === "/admin/users" ? "button--tertiary" : "button--ghost"
-        }`}
-      >
+      <Link href="/admin/courses" className={linkClasses(pathname === "/admin/courses")}>
+        <span className="w-full font-semibold inline-flex items-center gap-3">
+          <Books />
+          All Courses
+        </span>
+      </Link>
+      <Link href="/admin/users" className={linkClasses(pathname === "/admin/users")}>
         <span className="w-full font-semibold inline-flex items-center gap-3">
           <Persons />
           All Users

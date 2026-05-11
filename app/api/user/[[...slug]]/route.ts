@@ -47,6 +47,7 @@ export const app = new Elysia({ prefix: '/api/user' })
         avatorPath: user.avatorPath,
         firstname: user.firstname,
         lastname: user.lastname,
+        role: user.role,
       }
     })
   })
