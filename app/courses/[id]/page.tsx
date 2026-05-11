@@ -1,8 +1,24 @@
 import { Separator, Surface } from "@heroui/react";
+import { ArrowUpRightFromSquare, Calendar, FileText, Link } from "@gravity-ui/icons";
 import { api } from "@/app/api/course/[[...slug]]/route";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import EnrollButton from "./EnrollButton";
+
+type ResourceItem = {
+  id: string;
+  title: string;
+  type: "links" | "assignment";
+  links?: { label: string; url: string }[];
+  description?: string;
+  deadline?: string;
+  submissionUrl?: string;
+};
+
+type CourseContent = {
+  description?: string;
+  resources?: ResourceItem[];
+};
 
 export default async function CoursePage({
   params,
@@ -32,7 +48,9 @@ export default async function CoursePage({
   const course = courseRes.data as any;
   const enrolledCourses = (enrolledRes.data ?? []) as Array<{ id: number }>;
   const isEnrolled = enrolledCourses.some((c) => c.id === course.id);
-  const contentHtml = course.content?.description ?? course.content ?? "";
+  const content = (course.content ?? {}) as CourseContent;
+  const contentHtml = content.description ?? "";
+  const resources = content.resources ?? [];
 
   return (
     <div className="min-h-screen bg-(--tt-bg-color)">
@@ -47,6 +65,7 @@ export default async function CoursePage({
             <p className="text-(--tt-color-text-gray) mt-1">
               {course.code} &middot;{" "}
               {course.educator?.firstname} {course.educator?.lastname}
+              {course.faculty ? <> &middot; {course.faculty.code}</> : null}
             </p>
             {course.description && (
               <p className="mt-3 text-(--tt-color-text-gray)">
@@ -54,28 +73,87 @@ export default async function CoursePage({
               </p>
             )}
           </div>
-          <EnrollButton
-            courseId={course.id}
-            isEnrolled={isEnrolled}
-          />
+          <EnrollButton courseId={course.id} isEnrolled={isEnrolled} />
         </div>
 
         <Separator className="mb-8" />
 
-        {/* Course content */}
-        {contentHtml ? (
-          <Surface className="rounded-2xl border border-(--tt-card-border-color) p-8">
-            <div
-              className="prose max-w-none"
-              dangerouslySetInnerHTML={{ __html: contentHtml }}
-            />
+        {/* Rich content */}
+        {contentHtml && (
+          <Surface className="rounded-2xl border border-(--tt-card-border-color) p-8 mb-8">
+            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: contentHtml }} />
           </Surface>
-        ) : (
+        )}
+
+        {/* Resources & Assignments */}
+        {resources.length > 0 && (
+          <div className="flex flex-col gap-4">
+            <h2 className="text-xl font-bold">Resources & Assignments</h2>
+            {resources.map((r) => (
+              <Surface key={r.id} className="rounded-2xl border border-(--tt-card-border-color) p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  {r.type === "links" ? (
+                    <Link className="w-5 h-5 text-(--tt-brand-color-500)" />
+                  ) : (
+                    <FileText className="w-5 h-5 text-(--tt-color-text-orange)" />
+                  )}
+                  <h3 className="font-semibold text-lg">{r.title || "Untitled"}</h3>
+                </div>
+
+                {r.type === "links" && r.links && (
+                  <div className="flex flex-col gap-2 mt-3">
+                    {r.links.map((link, j) => (
+                      <a
+                        key={j}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 p-3 rounded-xl bg-(--tt-brand-color-50) hover:bg-(--tt-brand-color-100) transition-colors"
+                      >
+                        <ArrowUpRightFromSquare className="w-4 h-4 text-(--tt-brand-color-500) shrink-0" />
+                        <span className="font-medium">{link.label || link.url}</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+                {r.type === "assignment" && (
+                  <div className="mt-3 space-y-3">
+                    {r.description && (
+                      <p className="text-(--tt-color-text-gray)">{r.description}</p>
+                    )}
+                    <div className="flex flex-wrap gap-4 text-sm">
+                      {r.deadline && (
+                        <span className="inline-flex items-center gap-1 text-(--tt-color-text-gray)">
+                          <Calendar className="w-4 h-4" />
+                          Due: {new Date(r.deadline).toLocaleDateString()}
+                        </span>
+                      )}
+                      {r.submissionUrl && (
+                        <a
+                          href={r.submissionUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-(--tt-brand-color-500) hover:underline font-medium"
+                        >
+                          <ArrowUpRightFromSquare className="w-4 h-4" />
+                          Submit Assignment
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </Surface>
+            ))}
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!contentHtml && resources.length === 0 && (
           <div className="text-center py-16 text-(--tt-color-text-gray)">
             <p className="text-lg">No content has been added to this course yet.</p>
             <p className="text-sm mt-2">
-              The educator will add learning materials, resources, and
-              activities here.
+              The educator will add learning materials, resources, and activities here.
             </p>
           </div>
         )}

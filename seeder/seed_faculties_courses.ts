@@ -209,6 +209,43 @@ const main = async () => {
         content: {
           description:
             "<h2>Course Overview</h2><p>Welcome to CS101! This course introduces the fundamental concepts of computer science including programming basics, algorithms, data structures, and computational thinking.</p><h3>Learning Objectives</h3><ul><li>Write basic Python programs</li><li>Understand common data structures</li><li>Analyze algorithm complexity</li></ul>",
+          resources: [
+            {
+              id: "res-1",
+              title: "Week 1 Lecture Materials",
+              type: "links",
+              links: [
+                { label: "Lecture Slides (PDF)", url: "https://example.com/slides-week1.pdf" },
+                { label: "Python Setup Guide", url: "https://example.com/python-setup" },
+                { label: "Reading: Chapters 1-2", url: "https://example.com/textbook-ch1-2" },
+              ],
+            },
+            {
+              id: "res-2",
+              title: "Week 3 Lecture Materials",
+              type: "links",
+              links: [
+                { label: "Data Structures Slides", url: "https://example.com/slides-week3.pdf" },
+                { label: "Practice Problems", url: "https://example.com/practice-week3" },
+              ],
+            },
+            {
+              id: "res-3",
+              title: "Assignment 1: Calculator Program",
+              type: "assignment",
+              description: "Build a command-line calculator in Python supporting addition, subtraction, multiplication and division.",
+              deadline: "2025-10-15",
+              submissionUrl: "https://forms.gle/example-submission",
+            },
+            {
+              id: "res-4",
+              title: "Assignment 2: Data Structures Lab",
+              type: "assignment",
+              description: "Implement a linked list, stack, and queue in Python. Submit your code via the link below.",
+              deadline: "2025-11-20",
+              submissionUrl: "https://forms.gle/example-submission2",
+            },
+          ],
         },
       },
     }),
