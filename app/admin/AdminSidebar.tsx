@@ -1,7 +1,7 @@
 'use client'
 
 import { User } from "@/generated/prisma/client"
-import { ArrowRightFromSquare, House, PersonPencil, Persons, Tray } from "@gravity-ui/icons"
+import { ArrowRightFromSquare, BookOpen, House, PersonPencil, Persons, Tray } from "@gravity-ui/icons"
 import { Avatar, Button, Description, Label, Separator } from "@heroui/react"
 import Link from "next/link"
 import { redirect, usePathname } from "next/navigation"
@@ -33,6 +33,15 @@ const items = [
       </span>
     ),
     link: '/inbox'
+  },
+  {
+    text: (
+      <span className="inline-flex items-center gap-4">
+        <BookOpen />
+        Courses
+      </span>
+    ),
+    link: '/admin/courses'
   },
   {
     text: (
