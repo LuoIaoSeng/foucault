@@ -209,6 +209,20 @@ const main = async () => {
         content: {
           description:
             "<h2>Course Overview</h2><p>Welcome to CS101! This course introduces the fundamental concepts of computer science including programming basics, algorithms, data structures, and computational thinking.</p><h3>Learning Objectives</h3><ul><li>Write basic Python programs</li><li>Understand common data structures</li><li>Analyze algorithm complexity</li></ul>",
+          announcements: [
+            {
+              id: "ann-1",
+              title: "Welcome to CS101!",
+              content: "Welcome everyone! Please check the Week 1 materials below and make sure you have Python installed before our first lab session.",
+              date: "2025-09-01",
+            },
+            {
+              id: "ann-2",
+              title: "Midterm Exam Date Set",
+              content: "The midterm exam will be held on October 30th during regular class hours. Topics: Chapters 1-5.",
+              date: "2025-10-15",
+            },
+          ],
           resources: [
             {
               id: "res-1",

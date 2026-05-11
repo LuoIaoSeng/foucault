@@ -15,8 +15,16 @@ type ResourceItem = {
   submissionUrl?: string;
 };
 
+type Announcement = {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+};
+
 type CourseContent = {
   description?: string;
+  announcements?: Announcement[];
   resources?: ResourceItem[];
 };
 
@@ -50,6 +58,7 @@ export default async function CoursePage({
   const isEnrolled = enrolledCourses.some((c) => c.id === course.id);
   const content = (course.content ?? {}) as CourseContent;
   const contentHtml = content.description ?? "";
+  const announcements = content.announcements ?? [];
   const resources = content.resources ?? [];
 
   return (
@@ -83,6 +92,22 @@ export default async function CoursePage({
           <Surface className="rounded-2xl border border-(--tt-card-border-color) p-8 mb-8">
             <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: contentHtml }} />
           </Surface>
+        )}
+
+        {/* Announcements */}
+        {announcements.length > 0 && (
+          <div className="flex flex-col gap-4 mb-8">
+            <h2 className="text-xl font-bold">Announcements</h2>
+            {announcements.map((a) => (
+              <Surface key={a.id} className="rounded-2xl border border-(--tt-card-border-color) p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-semibold text-lg">{a.title || "Untitled"}</h3>
+                  <span className="text-xs text-(--tt-color-text-gray)">{a.date}</span>
+                </div>
+                {a.content && <p className="text-(--tt-color-text-gray)">{a.content}</p>}
+              </Surface>
+            ))}
+          </div>
         )}
 
         {/* Resources & Assignments */}
@@ -149,7 +174,7 @@ export default async function CoursePage({
         )}
 
         {/* Empty state */}
-        {!contentHtml && resources.length === 0 && (
+        {!contentHtml && announcements.length === 0 && resources.length === 0 && (
           <div className="text-center py-16 text-(--tt-color-text-gray)">
             <p className="text-lg">No content has been added to this course yet.</p>
             <p className="text-sm mt-2">

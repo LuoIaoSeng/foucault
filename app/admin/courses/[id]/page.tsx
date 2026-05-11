@@ -1,4 +1,4 @@
-import { ArrowLeft } from "@gravity-ui/icons";
+import { ArrowLeft, PencilToSquare } from "@gravity-ui/icons";
 import { Button, Separator } from "@heroui/react";
 import { api } from "@/app/api/course/[[...slug]]/route";
 import { cookies } from "next/headers";
@@ -32,13 +32,21 @@ export default async function EditCoursePage({
 
   return (
     <>
-      <div className="flex items-center gap-3">
-        <Link href="/admin/courses">
-          <Button isIconOnly variant="ghost" size="sm">
-            <ArrowLeft />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Link href="/admin/courses">
+            <Button isIconOnly variant="ghost" size="sm">
+              <ArrowLeft />
+            </Button>
+          </Link>
+          <h1 className="text-2xl font-bold">Course Settings</h1>
+        </div>
+        <Link href={`/admin/courses/${id}/content`}>
+          <Button>
+            <PencilToSquare />
+            Edit Content
           </Button>
         </Link>
-        <h1 className="text-2xl font-bold">Edit Course</h1>
       </div>
       <Separator />
       <CourseForm course={course as any} />
