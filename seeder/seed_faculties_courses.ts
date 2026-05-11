@@ -349,7 +349,7 @@ const main = async () => {
   });
 
   for (const student of students) {
-    for (const course of courses.slice(0, 4)) {
+    for (const course of courses) {
       await prisma.enrollment
         .create({
           data: { userId: student.id, courseId: course.id },
