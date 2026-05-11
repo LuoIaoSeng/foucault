@@ -205,7 +205,7 @@ export function ContentEditor({ course }: {
                       </TextField>
                       <Button isIconOnly variant="ghost" size="sm" onPress={() => removeSection(i)}><TrashBin /></Button>
                     </div>
-                    <div className="min-h-[200px] border border-(--tt-border-color) rounded-lg overflow-hidden">
+                    <div className="min-h-50 border border-(--tt-border-color) rounded-lg overflow-hidden">
                       <SimpleEditor
                         ref={(el: any) => {
                           if (el) sectionEditorRefs.current.set(s.id, el);
@@ -287,7 +287,7 @@ export function ContentEditor({ course }: {
                         <span className="text-sm text-(--tt-color-text-gray)">Uploading...</span>
                       )}
                       {r.fileName && !uploadingFile && (
-                        <span className="text-sm text-(--tt-brand-color-600) font-medium truncate max-w-[200px]">{r.fileName}</span>
+                        <span className="text-sm text-(--tt-brand-color-600) font-medium truncate max-w-50">{r.fileName}</span>
                       )}
                     </div>
                   </div>
