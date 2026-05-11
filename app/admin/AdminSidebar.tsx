@@ -1,12 +1,12 @@
 'use client'
 
 import { User } from "@/generated/prisma/client"
-import { ArrowRightFromSquare, House, PersonPencil, Persons, Tray } from "@gravity-ui/icons"
+import { ArrowRightFromSquare, BookOpen, House, PersonPencil, Persons, Tray } from "@gravity-ui/icons"
 import { Avatar, Button, Description, Label, Separator } from "@heroui/react"
 import Link from "next/link"
 import { redirect, usePathname } from "next/navigation"
 
-const items = [
+const allItems = [
   {
     text: (
       <span className="inline-flex items-center gap-4">
@@ -37,11 +37,21 @@ const items = [
   {
     text: (
       <span className="inline-flex items-center gap-4">
+        <BookOpen />
+        Courses
+      </span>
+    ),
+    link: '/admin/courses'
+  },
+  {
+    text: (
+      <span className="inline-flex items-center gap-4">
         <Persons />
         Users
       </span>
     ),
-    link: '/admin/users'
+    link: '/admin/users',
+    adminOnly: true,
   },
 ]
 
@@ -64,19 +74,21 @@ export default function ({ user }: {
         </div>
       </div>
       <div className="flex flex-col gap-1">
-        {items.map((item) => {
-          return (
-            <Link
-              href={item.link}
-              key={item.link}
-              className={`button w-full ${item.link === pathname ? 'button--tertiary' : 'button--ghost'}`}
-            >
-              <span className="w-full font-semibold">
-                {item.text}
-              </span>
-            </Link>
-          )
-        })} 
+        {allItems
+          .filter((item) => !item.adminOnly || user.role === "ADMIN")
+          .map((item) => {
+            return (
+              <Link
+                href={item.link}
+                key={item.link}
+                className={`button w-full ${item.link === pathname ? "button--tertiary" : "button--ghost"}`}
+              >
+                <span className="w-full font-semibold">
+                  {item.text}
+                </span>
+              </Link>
+            );
+          })}
       </div>
       <Separator />
       <div>

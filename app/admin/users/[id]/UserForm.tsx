@@ -7,10 +7,12 @@ import {
   Avatar,
   Badge,
   Button,
+  ComboBox,
   DateField,
   FieldError,
   Input,
   Label,
+  ListBox,
   Radio,
   RadioGroup,
   Surface,
@@ -19,7 +21,7 @@ import {
 } from "@heroui/react";
 import { parseDate } from "@internationalized/date";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function UserForm({ user }: { user: User | null }) {
   const router = useRouter();
@@ -34,7 +36,19 @@ export default function UserForm({ user }: { user: User | null }) {
   const [birthday, setBirthday] = useState(
     user?.birthday ? parseDate(getDateString(user.birthday)) : null,
   );
+  const [facultyId, setFacultyId] = useState<number | null>(
+    (user as any)?.facultyId ?? null,
+  );
+  const [faculties, setFaculties] = useState<
+    Array<{ id: number; code: string; name: string }>
+  >([]);
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/user/faculties")
+      .then((r) => r.json())
+      .then((data) => setFaculties(data));
+  }, []);
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -72,6 +86,7 @@ export default function UserForm({ user }: { user: User | null }) {
         birthday: birthday?.toString() ?? "",
         role,
         gender,
+        facultyId,
       }),
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -223,6 +238,32 @@ export default function UserForm({ user }: { user: User | null }) {
               </DateField.Input>
             </DateField.Group>
           </DateField>
+          <ComboBox
+            className="max-w-xs"
+            selectedKey={facultyId}
+            onSelectionChange={(k) => setFacultyId(k as number | null)}
+          >
+            <Label>Faculty (optional)</Label>
+            <ComboBox.InputGroup>
+              <Input placeholder="Select faculty..." />
+              <ComboBox.Trigger />
+            </ComboBox.InputGroup>
+            <ComboBox.Popover>
+              <ListBox>
+                {faculties.map((f) => (
+                  <ListBox.Item key={f.id} id={f.id} textValue={f.name}>
+                    <div className="flex flex-col">
+                      <span>{f.name}</span>
+                      <span className="text-xs text-(--tt-color-text-gray)">
+                        {f.code}
+                      </span>
+                    </div>
+                  </ListBox.Item>
+                ))}
+              </ListBox>
+            </ComboBox.Popover>
+          </ComboBox>
+
           <RadioGroup
             value={gender}
             onChange={setGender}
