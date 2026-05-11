@@ -2,17 +2,30 @@
 
 import { Plus } from "@gravity-ui/icons";
 import {
+  Avatar,
+  AvatarFallback,
   Button,
   ComboBox,
   Input,
   Label,
   ListBox,
   Modal,
+  Tag,
+  TagGroup,
   TextField,
   toast,
+  useListData,
 } from "@heroui/react";
+import type { Key } from "@react-types/shared";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
+type UserOption = {
+  id: number;
+  username: string;
+  firstname: string | null;
+  lastname: string;
+};
 
 export default function AddCourseForm() {
   const router = useRouter();
@@ -24,26 +37,23 @@ export default function AddCourseForm() {
   const [description, setDescription] = useState("");
   const [semester, setSemester] = useState("");
   const [educatorId, setEducatorId] = useState<number | null>(null);
-  const [educators, setEducators] = useState<
-    Array<{
-      id: number;
-      username: string;
-      firstname: string | null;
-      lastname: string;
-    }>
-  >([]);
+  const [users, setUsers] = useState<UserOption[]>([]);
+
+  const selectedTAs = useListData<UserOption>({
+    getKey: (item) => item.id,
+  });
 
   useEffect(() => {
     if (open) {
       fetch("/api/user/users")
         .then((r) => r.json())
-        .then((data: any[]) => {
-          setEducators(
-            data.filter((u: any) => u.role === "EDUCATOR" || u.role === "ADMIN"),
-          );
-        });
+        .then((data: any[]) => setUsers(data));
     }
   }, [open]);
+
+  const educators = users.filter(
+    (u: any) => u.role === "EDUCATOR" || u.role === "ADMIN",
+  );
 
   function reset() {
     setCode("");
@@ -51,6 +61,7 @@ export default function AddCourseForm() {
     setDescription("");
     setSemester("");
     setEducatorId(null);
+    selectedTAs.remove(...selectedTAs.items.map((t) => t.id));
   }
 
   async function handleCreate() {
@@ -68,6 +79,7 @@ export default function AddCourseForm() {
         description,
         semester,
         educatorId,
+        taIds: selectedTAs.items.map((t) => t.id),
       }),
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -144,7 +156,9 @@ export default function AddCourseForm() {
                     {educators.map((e) => (
                       <ListBox.Item key={e.id} id={e.id} textValue={e.username}>
                         <div className="flex flex-col">
-                          <span>{e.firstname} {e.lastname}</span>
+                          <span>
+                            {e.firstname} {e.lastname}
+                          </span>
                           <span className="text-xs text-(--tt-color-text-gray)">
                             @{e.username}
                           </span>
@@ -154,6 +168,71 @@ export default function AddCourseForm() {
                   </ListBox>
                 </ComboBox.Popover>
               </ComboBox>
+
+              {/* TA selector */}
+              <div className="flex flex-col gap-2">
+                <ComboBox
+                  onSelectionChange={(k) => {
+                    if (k == null) return;
+                    const user = users.find((u) => u.id === k);
+                    if (user && !selectedTAs.getItem(user.id)) {
+                      selectedTAs.append(user);
+                    }
+                  }}
+                >
+                  <Label>Teaching Assistants (optional)</Label>
+                  <ComboBox.InputGroup>
+                    <Input placeholder="Search users to add as TA..." />
+                    <ComboBox.Trigger />
+                  </ComboBox.InputGroup>
+                  <ComboBox.Popover>
+                    <ListBox>
+                      {users
+                        .filter((u) => !selectedTAs.getItem(u.id) && u.id !== educatorId)
+                        .map((u) => (
+                          <ListBox.Item key={u.id} id={u.id} textValue={u.username}>
+                            <Avatar size="sm">
+                              <AvatarFallback>
+                                {u.firstname?.at(0) ?? ""}
+                                {u.lastname?.at(0) ?? ""}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex flex-col">
+                              <span>
+                                {u.firstname} {u.lastname}
+                              </span>
+                              <span className="text-xs text-(--tt-color-text-gray)">
+                                @{u.username}
+                              </span>
+                            </div>
+                          </ListBox.Item>
+                        ))}
+                    </ListBox>
+                  </ComboBox.Popover>
+                </ComboBox>
+                <TagGroup
+                  onRemove={(keys: Set<Key>) => {
+                    for (const key of keys) {
+                      selectedTAs.remove(key);
+                    }
+                  }}
+                >
+                  <TagGroup.List
+                    items={selectedTAs.items}
+                    renderEmptyState={() => (
+                      <span className="text-xs text-(--tt-color-text-gray)">
+                        No TAs selected
+                      </span>
+                    )}
+                  >
+                    {(user) => (
+                      <Tag key={user.id} id={user.id} textValue={user.username}>
+                        {user.firstname} {user.lastname}
+                      </Tag>
+                    )}
+                  </TagGroup.List>
+                </TagGroup>
+              </div>
             </Modal.Body>
 
             <Modal.Footer className="px-8 pb-6">

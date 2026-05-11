@@ -26,6 +26,7 @@ export default function CourseTable({
     semester: string;
     educatorId: number;
     educator: { firstname: string | null; lastname: string; username: string };
+    tas?: Array<{ id: number; firstname: string | null; lastname: string }>;
     enrollments: Array<{ id: number }>;
   }>;
 }) {
@@ -94,11 +95,13 @@ export default function CourseTable({
               <Table.Column>Semester</Table.Column>
               <Table.Column>Educator</Table.Column>
               <Table.Column>Students</Table.Column>
+              <Table.Column>TAs</Table.Column>
               <Table.Column>Actions</Table.Column>
             </Table.Header>
             <Table.Body>
               {paginated.length === 0 ? (
                 <Table.Row>
+                  <Table.Cell>{" "}</Table.Cell>
                   <Table.Cell>{" "}</Table.Cell>
                   <Table.Cell>{" "}</Table.Cell>
                   <Table.Cell>No courses found.</Table.Cell>
@@ -120,6 +123,7 @@ export default function CourseTable({
                       {course.educator?.firstname} {course.educator?.lastname}
                     </Table.Cell>
                     <Table.Cell>{course.enrollments?.length ?? 0}</Table.Cell>
+                    <Table.Cell>{course.tas?.length ?? 0}</Table.Cell>
                     <Table.Cell>
                       <div className="flex items-center gap-1">
                         <Button

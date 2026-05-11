@@ -11,6 +11,7 @@ const courseBody = t.Object({
   content: t.Optional(t.Any()),
   semester: t.String(),
   educatorId: t.Integer(),
+  taIds: t.Optional(t.Array(t.Integer())),
 });
 
 export const app = new Elysia({ prefix: "/api/course" })
@@ -41,7 +42,7 @@ export const app = new Elysia({ prefix: "/api/course" })
   // List all courses (admin)
   .get("/all", async () => {
     return prisma.course.findMany({
-      include: { educator: true, enrollments: true },
+      include: { educator: true, tas: true, enrollments: true },
       orderBy: { createAt: "desc" },
     });
   })
@@ -71,7 +72,7 @@ export const app = new Elysia({ prefix: "/api/course" })
   .get("/:id", async ({ params: { id } }) => {
     const course = await prisma.course.findUnique({
       where: { id: parseInt(id) },
-      include: { educator: true, enrollments: true },
+      include: { educator: true, tas: true, enrollments: true },
     });
     if (!course) return status(404);
     return course;
@@ -89,7 +90,11 @@ export const app = new Elysia({ prefix: "/api/course" })
           content: body.content as JsonObject,
           semester: body.semester,
           educatorId: body.educatorId,
+          tas: body.taIds
+            ? { connect: body.taIds.map((id) => ({ id })) }
+            : undefined,
         },
+        include: { educator: true, tas: true, enrollments: true },
       });
       return course;
     },
@@ -110,16 +115,26 @@ export const app = new Elysia({ prefix: "/api/course" })
         return status("Unauthorized");
       }
 
+      const updateData: any = {
+        code: body.code,
+        name: body.name,
+        description: body.description,
+        content: body.content as JsonObject,
+        semester: body.semester,
+        educatorId: body.educatorId,
+      };
+
+      if (body.taIds !== undefined) {
+        updateData.tas = {
+          set: [],
+          connect: body.taIds.map((id) => ({ id })),
+        };
+      }
+
       return prisma.course.update({
         where: { id: parseInt(id) },
-        data: {
-          code: body.code,
-          name: body.name,
-          description: body.description,
-          content: body.content as JsonObject,
-          semester: body.semester,
-          educatorId: body.educatorId,
-        },
+        data: updateData,
+        include: { educator: true, tas: true, enrollments: true },
       });
     },
     { body: courseBody },

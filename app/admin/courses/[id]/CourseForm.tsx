@@ -2,20 +2,31 @@
 
 import { Check } from "@gravity-ui/icons";
 import {
+  Avatar,
+  AvatarFallback,
   Button,
   ComboBox,
   Input,
   Label,
   ListBox,
-  Separator,
   Surface,
+  Tag,
+  TagGroup,
   TextField,
   toast,
+  useListData,
 } from "@heroui/react";
+import type { Key } from "@react-types/shared";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SimpleEditor } from "@/app/components/SimpleEditor";
-import { useRef } from "react";
+
+type UserOption = {
+  id: number;
+  username: string;
+  firstname: string | null;
+  lastname: string;
+};
 
 export default function CourseForm({
   course,
@@ -28,6 +39,7 @@ export default function CourseForm({
     content: any;
     semester: string;
     educatorId: number;
+    tas?: Array<{ id: number; firstname: string | null; lastname: string; username: string }>;
   };
 }) {
   const router = useRouter();
@@ -38,25 +50,28 @@ export default function CourseForm({
   const [description, setDescription] = useState(course.description ?? "");
   const [semester, setSemester] = useState(course.semester);
   const [educatorId, setEducatorId] = useState<number>(course.educatorId);
-  const [educators, setEducators] = useState<
-    Array<{
-      id: number;
-      username: string;
-      firstname: string | null;
-      lastname: string;
-    }>
-  >([]);
+  const [users, setUsers] = useState<UserOption[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+
+  const selectedTAs = useListData<UserOption>({
+    initialItems: (course.tas ?? []).map((t) => ({
+      id: t.id,
+      username: t.username,
+      firstname: t.firstname,
+      lastname: t.lastname,
+    })),
+    getKey: (item) => item.id,
+  });
 
   useEffect(() => {
     fetch("/api/user/users")
       .then((r) => r.json())
-      .then((data: any[]) => {
-        setEducators(
-          data.filter((u: any) => u.role === "EDUCATOR" || u.role === "ADMIN"),
-        );
-      });
+      .then((data: any[]) => setUsers(data));
   }, []);
+
+  const educators = users.filter(
+    (u: any) => u.role === "EDUCATOR" || u.role === "ADMIN",
+  );
 
   async function handleSave() {
     if (!code || !name || !semester || educatorId == null) {
@@ -79,6 +94,7 @@ export default function CourseForm({
         semester,
         educatorId,
         content: contentJson,
+        taIds: selectedTAs.items.map((t) => t.id),
       }),
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -92,9 +108,6 @@ export default function CourseForm({
     }
     setIsSaving(false);
   }
-
-  const contentHtml =
-    course.content?.description ?? course.content ?? "";
 
   return (
     <div className="max-w-4xl flex flex-col gap-8">
@@ -167,6 +180,72 @@ export default function CourseForm({
               </ListBox>
             </ComboBox.Popover>
           </ComboBox>
+
+          {/* TA management */}
+          <div className="flex flex-col gap-2">
+            <ComboBox
+              onSelectionChange={(k) => {
+                if (k == null) return;
+                const user = users.find((u) => u.id === k);
+                if (user && !selectedTAs.getItem(user.id)) {
+                  selectedTAs.append(user);
+                }
+              }}
+            >
+              <Label>Teaching Assistants (optional)</Label>
+              <ComboBox.InputGroup>
+                <Input placeholder="Search users to add as TA..." />
+                <ComboBox.Trigger />
+              </ComboBox.InputGroup>
+              <ComboBox.Popover>
+                <ListBox>
+                  {users
+                    .filter((u) => !selectedTAs.getItem(u.id) && u.id !== educatorId)
+                    .map((u) => (
+                      <ListBox.Item key={u.id} id={u.id} textValue={u.username}>
+                        <Avatar size="sm">
+                          <AvatarFallback>
+                            {u.firstname?.at(0) ?? ""}
+                            {u.lastname?.at(0) ?? ""}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span>
+                            {u.firstname} {u.lastname}
+                          </span>
+                          <span className="text-xs text-(--tt-color-text-gray)">
+                            @{u.username}
+                          </span>
+                        </div>
+                      </ListBox.Item>
+                    ))}
+                </ListBox>
+              </ComboBox.Popover>
+            </ComboBox>
+            <TagGroup
+              onRemove={(keys: Set<Key>) => {
+                for (const key of keys) {
+                  selectedTAs.remove(key);
+                }
+              }}
+            >
+              <TagGroup.List
+                items={selectedTAs.items}
+                renderEmptyState={() => (
+                  <span className="text-xs text-(--tt-color-text-gray)">
+                    No TAs assigned
+                  </span>
+                )}
+              >
+                {(user) => (
+                  <Tag key={user.id} id={user.id} textValue={user.username}>
+                    {user.firstname} {user.lastname}
+                  </Tag>
+                )}
+              </TagGroup.List>
+            </TagGroup>
+          </div>
+
           <div>
             <Button onPress={handleSave} isDisabled={isSaving}>
               <Check />
